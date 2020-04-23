@@ -16,8 +16,8 @@ import javafx.stage.Stage;
 
 public class Main extends Application {
 
-  private static final int WINDOW_WIDTH = 500;
-  private static final int WINDOW_HEIGHT = 500;
+  private static final int WINDOW_WIDTH = 1920;
+  private static final int WINDOW_HEIGHT = 1080;
   private static final String APP_TITLE = "Todo App";
 
   @Override
@@ -35,6 +35,7 @@ public class Main extends Application {
 
   private Pane createPane() {
     // components
+	  
     String letters[] = {"A", "B", "C", "D", "E"};
     ComboBox<String> combo_box = new ComboBox<String>(FXCollections.observableArrayList(letters));
     Label placeholder = new Label("Content");
@@ -46,7 +47,6 @@ public class Main extends Application {
     settings.setId("settings_panel");
 
     // do menu stuff
-
     final Menu menu = new Menu("Menu");
     final MenuItem toggle = new MenuItem("Toggle Settings");
     final MenuItem view1 = new MenuItem("view1");
