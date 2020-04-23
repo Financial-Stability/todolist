@@ -23,6 +23,11 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundImage;
+import javafx.scene.layout.BackgroundPosition;
+import javafx.scene.layout.BackgroundRepeat;
+import javafx.scene.layout.BackgroundSize;
 
 public class Main extends Application {
 
@@ -51,7 +56,12 @@ public class Main extends Application {
     Label settingsTitle = new Label("Settings");
     MenuBar menuBar = new MenuBar();
     VBox settings = new VBox();
-
+    
+//    Image bgImg = new Image("file:backgroundPattern.JPEG",true);
+//    BackgroundImage background = new BackgroundImage(bgImg, BackgroundRepeat.REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT,
+//            BackgroundSize.DEFAULT);
+//    pane.setBackground(new Background(background));
+    
     // apply ids for styling
     settings.setId("settings_panel");
 
@@ -74,6 +84,8 @@ public class Main extends Application {
     root.setTop(menuBar);
     root.setLeft(settings);
     root.setCenter(createDisplayPane());
+    
+    
 
     return root;
   }
@@ -89,6 +101,11 @@ public class Main extends Application {
     buttons.getChildren().addAll(addTask, clearAll, clearChecked);
     pane.getChildren().addAll(taskName, buttons);
 
+    Image bgImg = new Image("file:backgroundPattern.JPEG",true);
+    BackgroundImage background = new BackgroundImage(bgImg, BackgroundRepeat.REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT,
+            BackgroundSize.DEFAULT);
+    pane.setBackground(new Background(background));
+    
     addTask.setOnAction(new EventHandler<ActionEvent>() {
       @Override
       public void handle(ActionEvent arg0) {
