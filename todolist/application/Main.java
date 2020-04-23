@@ -37,7 +37,7 @@ public class Main extends Application {
     // components
     String letters[] = {"A", "B", "C", "D", "E"};
     ComboBox<String> combo_box = new ComboBox<String>(FXCollections.observableArrayList(letters));
-    Button button = new Button("Done");
+    Label placeholder = new Label("Content");
     MenuBar menuBar = new MenuBar();
     VBox settings = new VBox();
     
@@ -63,7 +63,7 @@ public class Main extends Application {
 
     root.setTop(menuBar);
     root.setLeft(settings);
-    root.setCenter(button);
+    root.setCenter(placeholder);
 
     return root;
   }
