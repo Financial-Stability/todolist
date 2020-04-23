@@ -22,6 +22,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 
 public class Main extends Application {
 
@@ -43,6 +45,11 @@ public class Main extends Application {
   }
 
   private Pane createPane() {
+	// background image
+	  Image background = new Image("/anthony-menecola-2DPtxJwv3BQ-unsplash.JPEG", true);
+	  ImageView iv1 = new ImageView();
+	  iv1.setImage(background);
+	  
     // components
 
     String letters[] = {"A", "B", "C", "D", "E"};
