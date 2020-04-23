@@ -38,6 +38,7 @@ public class Main extends Application {
     String letters[] = {"A", "B", "C", "D", "E"};
     ComboBox<String> combo_box = new ComboBox<String>(FXCollections.observableArrayList(letters));
     Label placeholder = new Label("Content");
+    Label settingsTitle = new Label("Settings");
     MenuBar menuBar = new MenuBar();
     VBox settings = new VBox();
     
@@ -56,7 +57,7 @@ public class Main extends Application {
     menu.getItems().addAll(toggle, view1, view2, view3);
     menuBar.getMenus().addAll(menu, help);
     
-    settings.getChildren().addAll(combo_box);
+    settings.getChildren().addAll(settingsTitle, combo_box);
 
     // pane
     BorderPane root = new BorderPane();
