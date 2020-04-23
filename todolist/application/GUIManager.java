@@ -19,7 +19,14 @@ public class GUIManager extends Application {
 
   @Override
   public void start(Stage stage) throws Exception {
+	  
     args = this.getParameters().getRaw();
+    
+    int x;
+    x = 10;
+    
+    Label bottomLabel;
+    bottomLabel = new Label("a label");
 
     // components
     Label topLabel = new Label(APP_TITLE);
