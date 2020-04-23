@@ -83,8 +83,9 @@ public class Main extends Application {
     TextField taskName = new TextField("Task Name");
     HBox buttons = new HBox();
     Button addTask = new Button("Add");
-    Button clear = new Button("Clear");
-    buttons.getChildren().addAll(addTask, clear);
+    Button clearAll = new Button("Clear All");
+    Button clearChecked = new Button("Clear Checked");
+    buttons.getChildren().addAll(addTask, clearAll, clearChecked);
     pane.getChildren().addAll(taskName, buttons);
 
     addTask.setOnAction(new EventHandler<ActionEvent>() {
@@ -94,13 +95,28 @@ public class Main extends Application {
       }
     });
 
-    clear.setOnAction(new EventHandler<ActionEvent>() {
+    clearAll.setOnAction(new EventHandler<ActionEvent>() {
       @Override
       public void handle(ActionEvent arg0) {
         final List<Node> removeUs = new ArrayList<>();
         for (Node child : pane.getChildren()) {
           if (child instanceof CheckBox) {
             removeUs.add(child);
+          }
+        }
+        pane.getChildren().removeAll(removeUs);
+      }
+    });
+
+    clearChecked.setOnAction(new EventHandler<ActionEvent>() {
+      @Override
+      public void handle(ActionEvent arg0) {
+        final List<Node> removeUs = new ArrayList<>();
+        for (Node child : pane.getChildren()) {
+          if (child instanceof CheckBox) {
+            if (((CheckBox) child).isSelected()) {
+              removeUs.add(child);
+            }
           }
         }
         pane.getChildren().removeAll(removeUs);
