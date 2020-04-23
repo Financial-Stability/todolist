@@ -2,13 +2,19 @@ package application;
 
 import javafx.application.Application;
 import javafx.collections.FXCollections;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
@@ -37,7 +43,6 @@ public class Main extends Application {
     // components
     String letters[] = {"A", "B", "C", "D", "E"};
     ComboBox<String> combo_box = new ComboBox<String>(FXCollections.observableArrayList(letters));
-    Label placeholder = new Label("Content");
     Label settingsTitle = new Label("Settings");
     MenuBar menuBar = new MenuBar();
     VBox settings = new VBox();
@@ -64,9 +69,27 @@ public class Main extends Application {
 
     root.setTop(menuBar);
     root.setLeft(settings);
-    root.setCenter(placeholder);
+    root.setCenter(createDisplayPane());
 
     return root;
+  }
+  
+  private Node createDisplayPane() {
+    
+    VBox pane = new VBox();
+    TextField taskName = new TextField("Task Name");
+    Button addTask = new Button("Add");
+    pane.getChildren().addAll(taskName, addTask);
+    
+    addTask.setOnAction(new EventHandler<ActionEvent>() {
+      @Override
+      public void handle(ActionEvent arg0) {
+        pane.getChildren().add(new CheckBox(taskName.getText()));
+      }
+    });
+    
+    return pane;
+    
   }
 
   public static void main(String[] args) {
