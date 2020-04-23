@@ -6,7 +6,6 @@ import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -45,13 +44,8 @@ public class Main extends Application {
   }
 
   private Pane createPane() {
-	// background image
-	  Image background = new Image("/anthony-menecola-2DPtxJwv3BQ-unsplash.JPEG", true);
-	  ImageView iv1 = new ImageView();
-	  iv1.setImage(background);
-	  
-    // components
 
+    // components
     String letters[] = {"A", "B", "C", "D", "E"};
     ComboBox<String> combo_box = new ComboBox<String>(FXCollections.observableArrayList(letters));
     Label settingsTitle = new Label("Settings");
@@ -129,9 +123,7 @@ public class Main extends Application {
         pane.getChildren().removeAll(removeUs);
       }
     });
-
     return pane;
-
   }
 
   public static void main(String[] args) {
