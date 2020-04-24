@@ -122,7 +122,8 @@ public class Main extends Application {
     HBox buttons = new HBox();
     Button addTaskBtn = new Button("Add Task");
     Button removeTaskBtn = new Button("Remove Selected Task");
-    buttons.getChildren().addAll(addTaskBtn, removeTaskBtn);
+    Button clearAllBtn = new Button("Clear All");
+    buttons.getChildren().addAll(addTaskBtn, removeTaskBtn, clearAllBtn);
     pane.getChildren().addAll(taskName, buttons, treeView);
 
     addTaskBtn.setOnAction(new EventHandler<ActionEvent>() {
@@ -138,6 +139,18 @@ public class Main extends Application {
         removeTask();
       }
     });
+
+    clearAllBtn.setOnAction(new EventHandler<ActionEvent>() {
+      @Override
+      public void handle(ActionEvent event) {
+        List<TreeItem<String>> removeUs = new ArrayList<>();
+        for (TreeItem<String> item : treeView.getRoot().getChildren()) {
+          removeUs.add(item);
+        }
+        treeView.getRoot().getChildren().removeAll(removeUs);
+      }
+    });
+
     return pane;
   }
 
