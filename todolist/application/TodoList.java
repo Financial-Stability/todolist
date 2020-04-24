@@ -59,8 +59,9 @@ public class TodoList {
     Button addTaskBtn = new Button("Add Task");
     Button removeTaskBtn = new Button("Remove Selected Task");
     Button clearAllBtn = new Button("Clear All");
-    
-    buttons.getChildren().addAll(addTaskBtn, removeTaskBtn, clearAllBtn);
+    Button clearCheckedBtn = new Button("Clear Checked");
+
+    buttons.getChildren().addAll(addTaskBtn, removeTaskBtn, clearCheckedBtn, clearAllBtn);
     pane.getChildren().addAll(taskName, buttons, treeView);
 
     addTaskBtn.setOnAction(new EventHandler<ActionEvent>() {
@@ -80,15 +81,40 @@ public class TodoList {
     clearAllBtn.setOnAction(new EventHandler<ActionEvent>() {
       @Override
       public void handle(ActionEvent event) {
-        List<TreeItem<String>> removeUs = new ArrayList<>();
+        List<TreeItem<String>> removalList = new ArrayList<>();
         for (TreeItem<String> item : treeView.getRoot().getChildren()) {
-          removeUs.add(item);
+          removalList.add(item);
         }
-        treeView.getRoot().getChildren().removeAll(removeUs);
+        treeView.getRoot().getChildren().removeAll(removalList);
+      }
+    });
+
+    clearCheckedBtn.setOnAction(new EventHandler<ActionEvent>() {
+      @Override
+      public void handle(ActionEvent event) {
+        List<TreeItem<String>> removalList = new ArrayList<>();
+        for (TreeItem<String> item : treeView.getRoot().getChildren()) {
+          if (((CheckBoxTreeItem<String>) item).isSelected()) {
+            removalList.add(item);
+          }
+          recursiveClearCheckedHelper(item);
+        }
+        treeView.getRoot().getChildren().removeAll(removalList);
       }
     });
 
     return pane;
+  }
+
+  private void recursiveClearCheckedHelper(TreeItem<String> node) {
+    List<TreeItem<String>> removalList = new ArrayList<>();
+    for (TreeItem<String> item : node.getChildren()) {
+      if (((CheckBoxTreeItem<String>) item).isSelected()) {
+        removalList.add(item);
+      }
+      recursiveClearCheckedHelper(item);
+    }
+    node.getChildren().removeAll(removalList);
   }
 
   private void addTask(String value) {
@@ -104,9 +130,14 @@ public class TodoList {
   }
 
   private void removeTask() {
-
+    TreeItem<String> parent;
     TreeItem<String> item = treeView.getSelectionModel().getSelectedItem();
-    TreeItem<String> parent = item.getParent();
+    if (item != null) {
+      parent = item.getParent();
+    } else {
+      parent = null;
+      // no item selected to be removed
+    }
     if (parent == null) {
       // System.out.println("Cannot remove the root node.");
     } else {
