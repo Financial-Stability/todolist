@@ -10,12 +10,19 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.CheckBoxTreeItem;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TreeItem;
+import javafx.scene.control.TreeView;
+import javafx.scene.control.TreeView.EditEvent;
+import javafx.scene.control.cell.CheckBoxTreeCell;
+import javafx.scene.control.cell.TextFieldTreeCell;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -42,17 +49,33 @@ public class Main extends Application {
   }
 
   private Pane createPane() {
+    // Main pane
+    BorderPane root = new BorderPane();
 
+    root.setTop(createMenuBar());
+    root.setLeft(createSettings());
+    root.setCenter(createDisplayPane());
+
+    return root;
+  }
+
+  private Node createSettings() {
+    VBox settings = new VBox();
     // components
     String letters[] = {"A", "B", "C", "D", "E"};
     ComboBox<String> combo_box = new ComboBox<String>(FXCollections.observableArrayList(letters));
     Label settingsTitle = new Label("Settings");
-    MenuBar menuBar = new MenuBar();
-    VBox settings = new VBox();
 
     // apply ids for styling
     settings.setId("settings_panel");
 
+    settings.getChildren().addAll(settingsTitle, combo_box);
+
+    return settings;
+  }
+
+  private MenuBar createMenuBar() {
+    MenuBar menuBar = new MenuBar();
     // do menu stuff
     final Menu menu = new Menu("Menu");
     final MenuItem toggle = new MenuItem("Toggle Settings");
@@ -64,39 +87,61 @@ public class Main extends Application {
     menu.getItems().addAll(toggle, view1, view2, view3);
     menuBar.getMenus().addAll(menu, help);
 
-    settings.getChildren().addAll(settingsTitle, combo_box);
+    return menuBar;
+  }
 
-    // pane
-    BorderPane root = new BorderPane();
+  private TreeView<String> createTree() {
+    // create the tree model
+    List<CheckBoxTreeItem<String>> subtasks = new ArrayList<>();
 
-    root.setTop(menuBar);
-    root.setLeft(settings);
-    root.setCenter(createDisplayPane());
+    for (int i = 0; i < 5; i++) {
+      subtasks.add(new CheckBoxTreeItem<String>("Subtask " + i));
+    }
+    CheckBoxTreeItem<String> tasks = new CheckBoxTreeItem<String>("Tasks");
+    tasks.setExpanded(true);
+    tasks.getChildren().addAll(subtasks);
 
-    return root;
+    // create the treeView
+    final TreeView<String> treeView = new TreeView<String>();
+    treeView.setRoot(tasks);
+
+    // set the cell factory
+    treeView.setCellFactory(CheckBoxTreeCell.<String>forTreeView());
+
+    return treeView;
   }
 
   private Node createDisplayPane() {
 
+    TreeView<String> treeView = createTree();
+
     VBox pane = new VBox();
     TextField taskName = new TextField("Task Name");
     HBox buttons = new HBox();
-    Button addTask = new Button("Add");
+    Button addTaskBtn = new Button("Add Task");
+    Button removeTaskBtn = new Button("Remove Selected Task");
     Button clearAll = new Button("Clear All");
     Button clearChecked = new Button("Clear Checked");
-    buttons.getChildren().addAll(addTask, clearAll, clearChecked);
-    pane.getChildren().addAll(taskName, buttons);
+    buttons.getChildren().addAll(addTaskBtn, removeTaskBtn, clearAll, clearChecked);
+    pane.getChildren().addAll(taskName, buttons, treeView);
 
-    addTask.setOnAction(new EventHandler<ActionEvent>() {
+    addTaskBtn.setOnAction(new EventHandler<ActionEvent>() {
       @Override
-      public void handle(ActionEvent arg0) {
-        pane.getChildren().add(new CheckBox(taskName.getText()));
+      public void handle(ActionEvent event) {
+         addTask(taskName.getText());
+      }
+    });
+
+    removeTaskBtn.setOnAction(new EventHandler<ActionEvent>() {
+      @Override
+      public void handle(ActionEvent event) {
+
       }
     });
 
     clearAll.setOnAction(new EventHandler<ActionEvent>() {
       @Override
-      public void handle(ActionEvent arg0) {
+      public void handle(ActionEvent event) {
         final List<Node> removeUs = new ArrayList<>();
         for (Node child : pane.getChildren()) {
           if (child instanceof CheckBox) {
@@ -109,7 +154,7 @@ public class Main extends Application {
 
     clearChecked.setOnAction(new EventHandler<ActionEvent>() {
       @Override
-      public void handle(ActionEvent arg0) {
+      public void handle(ActionEvent event) {
         final List<Node> removeUs = new ArrayList<>();
         for (Node child : pane.getChildren()) {
           if (child instanceof CheckBox) {
@@ -122,6 +167,14 @@ public class Main extends Application {
       }
     });
     return pane;
+  }
+
+  private void addTask(String value) {
+
+  }
+
+  private void removeTask() {
+
   }
 
   public static void main(String[] args) {
