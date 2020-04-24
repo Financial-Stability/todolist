@@ -7,6 +7,7 @@ import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBoxTreeItem;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
@@ -18,6 +19,7 @@ public class TodoList {
 
   private Node displayPane;
   private TreeView<String> treeView;
+  private TextArea textOutput;
 
   public TodoList() {
     displayPane = createDisplayPane();
@@ -25,6 +27,10 @@ public class TodoList {
 
   public Node getDisplayPane() {
     return displayPane;
+  }
+
+  public void output(String message) {
+    textOutput.appendText(message + "\n");
   }
 
   private TreeView<String> createTree() {
@@ -60,9 +66,11 @@ public class TodoList {
     Button removeTaskBtn = new Button("Remove Selected Task");
     Button clearAllBtn = new Button("Clear All");
     Button clearCheckedBtn = new Button("Clear Checked");
+    textOutput = new TextArea();
+    textOutput.setEditable(false);
 
     buttons.getChildren().addAll(addTaskBtn, removeTaskBtn, clearCheckedBtn, clearAllBtn);
-    pane.getChildren().addAll(taskName, buttons, treeView);
+    pane.getChildren().addAll(taskName, buttons, treeView, textOutput);
 
     addTaskBtn.setOnAction(new EventHandler<ActionEvent>() {
       @Override
