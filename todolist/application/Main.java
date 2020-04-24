@@ -34,6 +34,7 @@ public class Main extends Application {
   private static final int WINDOW_WIDTH = 1920;
   private static final int WINDOW_HEIGHT = 1080;
   private static final String APP_TITLE = "Todo App";
+  private TreeView<String> treeView; // TODO this really shouldn't be here
 
   @Override
   public void start(Stage stage) throws Exception {
@@ -97,13 +98,14 @@ public class Main extends Application {
     for (int i = 0; i < 5; i++) {
       subtasks.add(new CheckBoxTreeItem<String>("Subtask " + i));
     }
-    CheckBoxTreeItem<String> tasks = new CheckBoxTreeItem<String>("Tasks");
-    tasks.setExpanded(true);
-    tasks.getChildren().addAll(subtasks);
+    CheckBoxTreeItem<String> root = new CheckBoxTreeItem<String>();
+    root.setExpanded(true);
+    root.getChildren().addAll(subtasks);
 
     // create the treeView
     final TreeView<String> treeView = new TreeView<String>();
-    treeView.setRoot(tasks);
+    treeView.setRoot(root);
+    treeView.setShowRoot(false);
 
     // set the cell factory
     treeView.setCellFactory(CheckBoxTreeCell.<String>forTreeView());
@@ -113,67 +115,53 @@ public class Main extends Application {
 
   private Node createDisplayPane() {
 
-    TreeView<String> treeView = createTree();
+    treeView = createTree();
 
     VBox pane = new VBox();
     TextField taskName = new TextField("Task Name");
     HBox buttons = new HBox();
     Button addTaskBtn = new Button("Add Task");
     Button removeTaskBtn = new Button("Remove Selected Task");
-    Button clearAll = new Button("Clear All");
-    Button clearChecked = new Button("Clear Checked");
-    buttons.getChildren().addAll(addTaskBtn, removeTaskBtn, clearAll, clearChecked);
+    buttons.getChildren().addAll(addTaskBtn, removeTaskBtn);
     pane.getChildren().addAll(taskName, buttons, treeView);
 
     addTaskBtn.setOnAction(new EventHandler<ActionEvent>() {
       @Override
       public void handle(ActionEvent event) {
-         addTask(taskName.getText());
+        addTask(taskName.getText());
       }
     });
 
     removeTaskBtn.setOnAction(new EventHandler<ActionEvent>() {
       @Override
       public void handle(ActionEvent event) {
-
-      }
-    });
-
-    clearAll.setOnAction(new EventHandler<ActionEvent>() {
-      @Override
-      public void handle(ActionEvent event) {
-        final List<Node> removeUs = new ArrayList<>();
-        for (Node child : pane.getChildren()) {
-          if (child instanceof CheckBox) {
-            removeUs.add(child);
-          }
-        }
-        pane.getChildren().removeAll(removeUs);
-      }
-    });
-
-    clearChecked.setOnAction(new EventHandler<ActionEvent>() {
-      @Override
-      public void handle(ActionEvent event) {
-        final List<Node> removeUs = new ArrayList<>();
-        for (Node child : pane.getChildren()) {
-          if (child instanceof CheckBox) {
-            if (((CheckBox) child).isSelected()) {
-              removeUs.add(child);
-            }
-          }
-        }
-        pane.getChildren().removeAll(removeUs);
+        removeTask();
       }
     });
     return pane;
   }
 
   private void addTask(String value) {
-
+    TreeItem<String> parent = treeView.getSelectionModel().getSelectedItem();
+    CheckBoxTreeItem<String> newTask = new CheckBoxTreeItem<String>(value);
+    if (parent == null || treeView.getTreeItemLevel(parent) == 0) {
+      parent = treeView.getRoot();
+    }
+    parent.getChildren().add(newTask);
+    if (!parent.isExpanded()) {
+      parent.setExpanded(true);
+    }
   }
 
   private void removeTask() {
+
+    TreeItem<String> item = treeView.getSelectionModel().getSelectedItem();
+    TreeItem<String> parent = item.getParent();
+    if (parent == null) {
+      System.out.println("Cannot remove the root node.");
+    } else {
+      parent.getChildren().remove(item);
+    }
 
   }
 
