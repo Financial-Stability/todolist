@@ -1,5 +1,6 @@
 package application;
 
+import java.awt.TextArea;
 import java.util.ArrayList;
 import java.util.List;
 import javafx.application.Application;
@@ -19,11 +20,14 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.BackgroundImage;
 import javafx.scene.layout.BackgroundPosition;
 import javafx.scene.layout.BackgroundRepeat;
@@ -109,7 +113,22 @@ public class Main extends Application {
     addTask.setOnAction(new EventHandler<ActionEvent>() {
       @Override
       public void handle(ActionEvent arg0) {
-        pane.getChildren().add(new CheckBox(taskName.getText()));
+
+    	  HBox listElmContainer = new HBox();
+    	  TextField tagLabel = new TextField("Tag Text");
+    	  CheckBox checkBox = new CheckBox(taskName.getText());
+    	  
+    	  listElmContainer.setBackground((new Background(new BackgroundFill(Color.rgb(240, 250, 250), null,null))));
+    	  
+    	  HBox.setHgrow(checkBox, Priority.ALWAYS);
+    	  checkBox.setPrefWidth(100000);
+    	  HBox.setHgrow(tagLabel, Priority.ALWAYS);
+    	  tagLabel.setPrefWidth(100000);
+//    	  
+    	  listElmContainer.getChildren().addAll(checkBox, tagLabel);
+    	  pane.getChildren().add(listElmContainer);
+    	  
+
       }
     });
 
