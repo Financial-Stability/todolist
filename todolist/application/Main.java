@@ -15,11 +15,11 @@ public class Main extends Application {
   @Override
   public void start(Stage stage) throws Exception {
 
-    // scene
+    // set the scene
     Scene mainScene = new Scene(createPane(), WINDOW_WIDTH, WINDOW_HEIGHT);
-
     mainScene.getStylesheets().add(getClass().getResource("stylesheet.css").toString());
 
+    // set the stage
     stage.setTitle(APP_TITLE);
     stage.setScene(mainScene);
     stage.show();
@@ -31,11 +31,9 @@ public class Main extends Application {
 
     // Main pane
     BorderPane root = new BorderPane();
-
     root.setTop(dm.getMenuBar());
     root.setLeft(dm.getSettings());
     root.setCenter(tl.getDisplayPane());
-
     return root;
   }
 

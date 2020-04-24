@@ -1,6 +1,8 @@
 package application;
 
 import javafx.collections.FXCollections;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -12,11 +14,13 @@ import javafx.scene.layout.VBox;
 public class DisplayManager {
 
   private MenuBar menuBar;
-  private Node settings;
+  private Node settingsPanel;
+  private Boolean settingsVisible;
 
   public DisplayManager() {
     menuBar = createMenuBar();
-    settings = createSettings();
+    settingsPanel = createSettings();
+    settingsVisible = true;
   }
 
   /**
@@ -30,7 +34,7 @@ public class DisplayManager {
    * @return the settings
    */
   public Node getSettings() {
-    return settings;
+    return settingsPanel;
   }
 
   private Node createSettings() {
@@ -60,6 +64,19 @@ public class DisplayManager {
 
     menu.getItems().addAll(toggle, view1, view2, view3);
     menuBar.getMenus().addAll(menu, help);
+
+    toggle.setOnAction(new EventHandler<ActionEvent>() {
+      @Override
+      public void handle(ActionEvent arg0) {
+        if (settingsVisible) {
+          settingsPanel.setVisible(false);
+          settingsVisible = false;
+        } else {
+          settingsPanel.setVisible(true);
+          settingsVisible = true;
+        }
+      }
+    });
 
     return menuBar;
   }
