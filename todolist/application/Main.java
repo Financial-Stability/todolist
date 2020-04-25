@@ -4,6 +4,7 @@ import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 public class Main extends Application {
@@ -28,11 +29,14 @@ public class Main extends Application {
   private Pane createPane() {
     DisplayManager dm = new DisplayManager();
     TodoList tl = new TodoList();
+    
+    VBox settings = new VBox();
+    settings.getChildren().addAll(dm.getSettings(), tl.getSettings());
 
     // Main pane
     BorderPane root = new BorderPane();
     root.setTop(dm.getMenuBar());
-    root.setLeft(dm.getSettings());
+    root.setLeft(settings);
     root.setCenter(tl.getDisplayPane());
     return root;
   }

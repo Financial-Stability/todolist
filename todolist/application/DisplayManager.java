@@ -46,7 +46,6 @@ public class DisplayManager {
 
     // apply ids for styling
     settings.setId("settings_panel");
-
     settings.getChildren().addAll(settingsTitle, combo_box);
 
     return settings;

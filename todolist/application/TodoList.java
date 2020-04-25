@@ -2,12 +2,15 @@ package application;
 
 import java.util.ArrayList;
 import java.util.List;
+import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.CheckBoxTreeItem;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeItem;
@@ -30,9 +33,11 @@ public class TodoList {
   private Node displayPane;
   private TreeView<String> treeView;
   private TextArea textOutput;
+  private Node settingsPanel;
 
   public TodoList() {
     displayPane = createDisplayPane();
+    settingsPanel = createSettings();
   }
 
   public Node getDisplayPane() {
@@ -41,6 +46,27 @@ public class TodoList {
 
   public void output(String message) {
     textOutput.appendText(message + "\n");
+  }
+
+  /**
+   * @return the settings
+   */
+  public Node getSettings() {
+    return settingsPanel;
+  }
+
+  private Node createSettings() {
+    VBox settings = new VBox();
+    // components
+    String letters[] = {"A", "B", "C", "D", "E"};
+    ComboBox<String> combo_box = new ComboBox<String>(FXCollections.observableArrayList(letters));
+    Label settingsTitle = new Label("Settings");
+
+    // apply ids for styling
+    settings.setId("settings_panel");
+    settings.getChildren().addAll(settingsTitle, combo_box);
+
+    return settings;
   }
 
   private TreeView<String> createTree() {
@@ -166,6 +192,6 @@ public class TodoList {
     } else {
       parent.getChildren().remove(item);
     }
-
   }
+
 }
