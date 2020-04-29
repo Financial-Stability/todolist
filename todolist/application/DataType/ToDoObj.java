@@ -30,6 +30,10 @@ public class ToDoObj {
 		return attributes;
 	}
 	
+	public String getAttribute(String key) {
+		return attributes.get(key);
+	}
+	
 	public void setAttribute(String attribute, String value) {
 		this.attributes.put(attribute, value);
 	}

@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import application.DataType.ToDoObj;
@@ -55,14 +56,12 @@ public class TodoList {
 	private TextArea textOutput;
 	private Node settingsPanel;
 	
+	List<String> tabTitles = new ArrayList<>(); // Must be initialized with = or null point probable
+	
 	// Data Structure
-	private Tree root = new Tree("root");
+	private Tree TaskData = new Tree("taskdata");
 
 	public TodoList() {
-
-//		displayPane = createDisplayPane();
-		displayPane = createTabPane();
-		settingsPanel = createSettings();
 		
 		// Filler Data
 		
@@ -73,7 +72,7 @@ public class TodoList {
 		project1.addTask(new ToDoObj("Meet group members", "11/2/20", "5:10"));
 		project1.addTask(new ToDoObj("Write proposal", "11/2/20", "5:10"));
 		school.addTree("project1", project1);
-		root.addTree("school", school);
+		TaskData.addTree("school", school);
 		
 		Tree home = new Tree("Home");
 		home.addTask(new ToDoObj("Do dishes", "fa", "14:23"));
@@ -83,10 +82,23 @@ public class TodoList {
 		buildDeck.addTask(new ToDoObj("Buy wood", "12/5/21", "14:23"));
 		buildDeck.addTask(new ToDoObj("Buy nails", "1/1/41", "14:23"));
 		home.addTree("Build Deck", buildDeck);
-		root.addTree("home", home);
+		TaskData.addTree("home", home);
 
-		System.out.println(root.getTree("home").getTitle());
+		System.out.println(TaskData.getTree("home").getTitle());
+		
+		for (Entry<String, Tree> entry : TaskData.getTreeList().entrySet()) {
+			
+			tabTitles.add(entry.getKey());
+			
+//		   System.out.println(entry.getValue().getTaskList().get(0).getAttribute("title"));
+		}
+		
+		// Create display panes
+//		displayPane = createDisplayPane();
+		displayPane = createTabPane();
+		settingsPanel = createSettings();
 	}
+	
 
 	public Node getDisplayPane() {
 		return displayPane;
@@ -119,32 +131,64 @@ public class TodoList {
 
 	private TabPane createTabPane() {
 
-		// Create overarching display pane
 		TabPane tabPane = new TabPane();
-
-		// Create a list of tab titles according to keys
-		List<String> tabTitles = new ArrayList<>();
-		// An array holding all tab objects
-//	  List<Tab> tabs = new ArrayList<>();
-
-//	  tabTitles.addAll(lhm.keySet());
-
-		System.out.print("TabTitles:");
-		System.out.println(tabTitles);
-
-//	  for(String entry:lhm.keySet()) {
-//		  System.out.println(entry);
-//	  }
-
-		Tab tab1 = new Tab("Planes", new Label("Show all planes available"));
-		Tab tab2 = new Tab("Cars", new Label("Show all cars available"));
-		Tab tab3 = new Tab("Boats", new Label("Show all boats available"));
-
-		tabPane.getTabs().add(tab1);
-		tabPane.getTabs().add(tab2);
-		tabPane.getTabs().add(tab3);
+		
+//		for (String tabTitle : tabTitles) {
+//			
+//			// Subtabs are filler data
+//			TabPane subTabs = new TabPane();
+//			Tab tab1 = new Tab("Planes", new Label("Show all planes available"));
+//			Tab tab2 = new Tab("Cars", new Label("Show all cars available"));
+//			Tab tab3 = new Tab("Boats", new Label("Show all boats available"));
+//			subTabs.getTabs().add(tab1);
+//			subTabs.getTabs().add(tab2);
+//			subTabs.getTabs().add(tab3);
+//			
+//			// Create new tab with elements on page
+//			Tab newTab = new Tab(tabTitle, subTabs);
+//			tabPane.getTabs().add(newTab);
+//			
+//		}
+		
+		for (Tree topTree : ) {
+			
+		}
 
 		return tabPane;
+		
+	}
+	
+	private TabPane recurseTabHelper(Tree toptree) {
+		
+		TabPane tabPane = new TabPane();
+		TreeView<String> taskList = createListView(toptree.getTaskList()); // Create list content to be added to new tab
+
+		ArrayList<TabPane> subTabs = new ArrayList<TabPane>();
+		for (String subTreeName : toptree.getTreeList().keySet()) {
+			subTabs.add(recurseTabHelper(toptree.getTree(subTreeName)));
+		}
+		
+		VBox listTabContainer = new VBox(tabPane, taskList);
+		Tab newTab = new Tab(toptree.getTitle(), listTabContainer);
+		tabPane.getTabs().add(newTab);
+		return tabPane;
+	}
+	
+	private TreeView<String> createListView(ArrayList<String> taskList) {
+		
+		CheckBoxTreeItem<String> root = new CheckBoxTreeItem<String>(); // Create a root to act as TreeView's base
+		root.setExpanded(true);
+		for (String task : taskList) {
+			root.getChildren().add(new CheckBoxTreeItem<String>(task));
+		}
+		
+		// TreeView not showing base root
+		final TreeView<String> listView = new TreeView<String>();
+		listView.setCellFactory(CheckBoxTreeCell.<String>forTreeView());
+		listView.setRoot(root);
+	    listView.setShowRoot(false);
+		
+		return listView;
 	}
 
 }

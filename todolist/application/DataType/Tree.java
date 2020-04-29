@@ -55,8 +55,18 @@ public class Tree {
 	}
 
 	// Task List
-	public ArrayList<ToDoObj> getTaskList() {
+	public ArrayList<ToDoObj> getTaskObjects() {
 		return TaskList;
+	}
+	
+	public ArrayList<String> getTaskList() {
+		
+		ArrayList<String> taskList = new ArrayList<String>();
+		for (ToDoObj obj : TaskList) {
+			taskList.add(obj.getAttribute("title"));
+		}
+		
+		return taskList;
 	}
 
 	public void addTask(ToDoObj task) {
