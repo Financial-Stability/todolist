@@ -24,12 +24,13 @@ import java.util.HashMap;
 public class Tree {
 
 	private String title; // Name of list
-//  private String description;            // Notes/Description of list
+	private String description; // Notes/Description of list
 	private ArrayList<ToDoObj> TaskList = new ArrayList<ToDoObj>(); // List of tasks
 	private HashMap<String, Tree> TreeList = new HashMap<String, Tree>(); // List of other lists
 
-	public Tree(String title) {
+	public Tree(String title, String description) {
 		this.title = title;
+		this.description = description;
 	}
 
 	// Title
@@ -41,6 +42,15 @@ public class Tree {
 		this.title = newTitle;
 	}
 
+	// Description
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String newDescription) {
+		this.description = newDescription;
+	}
+
 	// Tree List
 	public HashMap<String, Tree> getTreeList() {
 		return TreeList;
@@ -49,7 +59,7 @@ public class Tree {
 	public void addTree(String treeName, Tree tree) {
 		this.TreeList.put(treeName, tree);
 	}
-	
+
 	public Tree getTree(String key) {
 		return TreeList.get(key);
 	}
@@ -58,14 +68,14 @@ public class Tree {
 	public ArrayList<ToDoObj> getTaskObjects() {
 		return TaskList;
 	}
-	
+
 	public ArrayList<String> getTaskList() {
-		
+
 		ArrayList<String> taskList = new ArrayList<String>();
 		for (ToDoObj obj : TaskList) {
 			taskList.add(obj.getAttribute("title"));
 		}
-		
+
 		return taskList;
 	}
 

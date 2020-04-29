@@ -59,26 +59,26 @@ public class TodoList {
 	List<String> tabTitles = new ArrayList<>(); // Must be initialized with = or null point probable
 	
 	// Data Structure
-	private Tree TaskData = new Tree("taskdata");
+	private Tree TaskData = new Tree("taskdata", "Base Tree object which all information stems from");
 
 	public TodoList() {
 		
 		// Filler Data
 		
-		Tree school = new Tree("school");
+		Tree school = new Tree("school", "");
 		school.addTask(new ToDoObj("Do Homework", "11/14/20", "13:07"));
 		school.addTask(new ToDoObj("Clear Whiteboard", "11/12/20", "14:23"));
-		Tree project1 = new Tree("Project1");
+		Tree project1 = new Tree("Project1", "Research and propose an environmental system");
 		project1.addTask(new ToDoObj("Meet group members", "11/2/20", "5:10"));
 		project1.addTask(new ToDoObj("Write proposal", "11/2/20", "5:10"));
 		school.addTree("project1", project1);
 		TaskData.addTree("school", school);
 		
-		Tree home = new Tree("Home");
+		Tree home = new Tree("home", "Things to be done around the house");
 		home.addTask(new ToDoObj("Do dishes", "fa", "14:23"));
 		home.addTask(new ToDoObj("Feed dog", "ada", "14:23"));
 		home.addTask(new ToDoObj("Wipe counter", "adfa", "14:23"));
-		Tree buildDeck = new Tree("Build Deck");
+		Tree buildDeck = new Tree("Build Deck", "");
 		buildDeck.addTask(new ToDoObj("Buy wood", "12/5/21", "14:23"));
 		buildDeck.addTask(new ToDoObj("Buy nails", "1/1/41", "14:23"));
 		home.addTree("Build Deck", buildDeck);
@@ -150,28 +150,38 @@ public class TodoList {
 //			
 //		}
 		
-		for (Tree topTree : ) {
-			
+		for (String topTree : TaskData.getTreeList().keySet()) {
+			System.out.println(topTree);
+			Tab tab = recurseTabHelper(TaskData.getTree(topTree));
+			tabPane.getTabs().add(tab);
 		}
 
 		return tabPane;
 		
 	}
 	
-	private TabPane recurseTabHelper(Tree toptree) {
+	private Tab recurseTabHelper(Tree toptree) {
 		
-		TabPane tabPane = new TabPane();
+//		System.out.println(toptree.getTitle());
+		
+//		TabPane tabPane = new TabPane(); 
 		TreeView<String> taskList = createListView(toptree.getTaskList()); // Create list content to be added to new tab
 
-		ArrayList<TabPane> subTabs = new ArrayList<TabPane>();
-		for (String subTreeName : toptree.getTreeList().keySet()) {
-			subTabs.add(recurseTabHelper(toptree.getTree(subTreeName)));
+		ArrayList<Tab> subTabs = new ArrayList<Tab>();
+		for (String subTabName : toptree.getTreeList().keySet()) {
+			
+			Tab subTab = recurseTabHelper(toptree.getTree(subTabName));
+			subTabs.add(subTab);
+		
 		}
 		
-		VBox listTabContainer = new VBox(tabPane, taskList);
+		TabPane tabPane = new TabPane(); 
+		tabPane.getTabs().addAll(subTabs);
+		
+		VBox listTabContainer = new VBox(new Label(toptree.getDescription()),tabPane, taskList);
 		Tab newTab = new Tab(toptree.getTitle(), listTabContainer);
-		tabPane.getTabs().add(newTab);
-		return tabPane;
+//		tabPane.getTabs().add(newTab);
+		return newTab;
 	}
 	
 	private TreeView<String> createListView(ArrayList<String> taskList) {
