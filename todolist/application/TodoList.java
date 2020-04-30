@@ -23,7 +23,7 @@ import javafx.scene.layout.VBox;
 // TODO: Underneath current tab's list view, only display one set of tasks from parent category (possibly add a scroll)
 // TODO: Add pop-up to add information when creating a new tab
 // TODO: Edit tasks which are already in lists
-// TODO: Add methods to add/remove tasks in lists
+// TODO: Add methods to add/remove tasks in lists (Avery's buttons)
 // TODO: Edit descriptions under Trees
 
 public class TodoList {
