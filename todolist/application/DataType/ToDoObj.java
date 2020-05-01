@@ -15,10 +15,7 @@ public class ToDoObj {
 	@param timeAdded : time added TODO: determine format
 	*/
 	
-	public ToDoObj(String title, String dueDate, String timeAdded)
-	// Constructor
-	  {
-		// Title
+	public ToDoObj(String title, String dueDate, String timeAdded){
 		this.attributes = new HashMap<String, String>() {{
 			put("title", title);
 			put("dueDate", dueDate);
@@ -26,12 +23,13 @@ public class ToDoObj {
 		}};
 	  }
 	
-	public HashMap<String, String> getAttributes() {
-		return attributes;
-	}
+//	public HashMap<String, String> getAttributes() {
+//		return attributes;
+//	}
 	
 	public String getAttribute(String key) {
-		return attributes.get(key);
+		String attributeValue = attributes.get(key);
+		return attributeValue;
 	}
 	
 	public void setAttribute(String attribute, String value) {

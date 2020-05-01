@@ -3,34 +3,44 @@ package application;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Optional;
 
 import application.DataType.ToDoObj;
 import application.DataType.Tree;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.CheckBoxTreeItem;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.TextInputDialog;
+import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.control.cell.CheckBoxTreeCell;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.stage.StageStyle;
 
-// TODO: Underneath current tab's list view, only display one set of tasks from parent category (possibly add a scroll)
-// TODO: Add pop-up to add information when creating a new tab
 // TODO: Edit tasks which are already in lists
-// TODO: Add methods to add/remove tasks in lists (Avery's buttons)
 // TODO: Edit descriptions under Trees
+// TODO: Create new top-level project, use individual tree object for each (make project DataType)
+// TODO: Make all tabs from createTabContent()
+// TODO: Add size standards for all the lists and scroll bars besides the particularly long ones
 
 public class TodoList {
 
 	private Node displayPane;
 	private TextArea textOutput;
 	private Node settingsPanel;
+	private TabPane tabPane = new TabPane();
 
 	List<String> tabTitles = new ArrayList<>(); // Must be initialized with = or null point probable
 
@@ -56,7 +66,7 @@ public class TodoList {
 		Tree shootBird = new Tree("Shoot that annoying bird outside my window", "He tweet very loud");
 		shootBird.addTask(new ToDoObj("Triangulate position", "12/5/21", "14:23"));
 		shootBird.addTask(new ToDoObj("Calculate bullet trajectory", "1/1/41", "14:23"));
-		shootBird.addTask(new ToDoObj("Eat pork", "1/1/41", "14:23"));
+		shootBird.addTask(new ToDoObj("Start oven", "1/1/41", "14:23"));
 		home.addTree("Shoot Bird", shootBird);
 		Tree buildDeck = new Tree("Build Deck", "");
 		buildDeck.addTask(new ToDoObj("Buy wood", "12/5/21", "14:23"));
@@ -68,7 +78,7 @@ public class TodoList {
 		home.addTree("Build Deck", buildDeck);
 		TaskData.addTree("home", home);
 
-		System.out.println(TaskData.getTree("home").getTitle());
+//		System.out.println(TaskData.getTree("home").getTitle()); // Typical call to DataStructure
 
 		for (Entry<String, Tree> entry : TaskData.getTreeList().entrySet()) {
 
@@ -112,22 +122,21 @@ public class TodoList {
 
 	private TabPane createTabPane() {
 
-		TabPane tabPane = new TabPane();
-
-		// For every head topic uses recursive loop to build tab layout
-		for (String topTree : TaskData.getTreeList().keySet()) {
-			System.out.println(topTree);
-			Tab tab = recurseTabBuilder(TaskData.getTree(topTree));
-			tabPane.getTabs().add(tab);
-		}
+		tabPane.getTabs().add(recurseTabBuilder(TaskData));
 
 		return tabPane;
 	}
 
+	/**
+	 * 
+	 * @param toptree : (Tree) base tree of DataType
+	 * @return
+	 */
 	private Tab recurseTabBuilder(Tree toptree) {
 
 		TabPane tabPane = new TabPane();
-		TreeView<String> taskList = createListView(toptree.getTaskList()); // Create list content to be added to new tab
+		TreeView<String> taskList = createListContent(toptree.getTaskList()); // List content to be added to new tab
+		taskList.setPrefHeight(taskList.getRoot().getChildren().size() * 30); // The value 30 should not be hardcoded
 
 		// For each tree beneath this one call this function again. Trees with no other
 		// trees under them run this loop 0 times
@@ -136,18 +145,25 @@ public class TodoList {
 			tabPane.getTabs().add(subTab);
 		}
 
-		// Create new tab button by checking if last tab of tabDisplay is clicked each
-		// time tabs are changed through event listener and adding new tab at the index
-		// before it
+		// Create a "new tab" button by checking if last tab of tabDisplay is clicked
+		// each time tabs are changed through event listener and adding new tab at the
+		// index before it
 		if (tabPane.getTabs().size() > 0) {
-			Tab tibTab = new Tab();
-			tabPane.getTabs().add(tibTab);
+			Button newProjectButton = new Button("Click here to begin adding subprojects to this project");
+			Tab newTabTab = new Tab("+", newProjectButton);
+			newTabTab.setClosable(false);
+			tabPane.getTabs().add(newTabTab);
 			tabPane.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Tab>() {
 				@Override
-				public void changed(ObservableValue<? extends Tab> ov, Tab t, Tab t1) {
+				public void changed(ObservableValue<? extends Tab> ov, Tab t, Tab t1) { // When tab selection changes,
 					if (tabPane.getSelectionModel().getSelectedIndex() == tabPane.getTabs().size() - 1) {
-						Tab tab = new Tab("NEW TAB✂🔓🎁🧨🎈");
-						tabPane.getTabs().add(tabPane.getTabs().size() - 1, tab);
+						String result = doTextInputDialogue("New Project:", "Title: ");
+						if (result != "") {
+							Tree newTree = new Tree(result, "");
+							toptree.addTree(result, newTree);
+							Tab createdTab = createTabContent(result, newTree);
+							tabPane.getTabs().add(tabPane.getTabs().size() - 1, createdTab);
+						}
 						tabPane.getSelectionModel().select(tabPane.getTabs().size() - 2);
 					}
 				}
@@ -157,17 +173,113 @@ public class TodoList {
 		// Separates elements under each tab using VBox and creates the new, single tab
 		// to return
 //		VBox listTabContainer = new VBox(new Label(toptree.getDescription()), new Button("Add SubCategories"), tabPane, taskList);
-		VBox listTabContainer = new VBox(new Label(toptree.getDescription()), tabPane, taskList);
+		VBox listTabContainer = new VBox(new Label(toptree.getDescription()), taskList, tabPane);
 		Tab newTab = new Tab(toptree.getTitle(), listTabContainer);
 
 		return newTab;
 	}
 
 	/**
-	 * @param TaskList<String> : a list of elements to be displayed
+	 * @param header  : appears in center of window
+	 * @param content : appears beside input box
+	 */
+	private String doTextInputDialogue(String header, String content) {
+		TextInputDialog dialog = new TextInputDialog("");
+//		dialog.setTitle("New project"); // Title removed when StageStyle.UNDECORATED
+		dialog.setHeaderText(header);
+		dialog.setContentText(content);
+		dialog.initStyle(StageStyle.UNDECORATED); // THIS GETS RID OF BORDERS AROUND WINDOWS!!!!!!!!!!
+		Optional<String> result = dialog.showAndWait(); // Get response value from dialogue
+		if (result.isPresent() && result.get().length() > 0) {
+			return result.get();
+		} else {
+			return "";
+		}
+	}
+
+	private Tab createTabContent(String title, Tree newtree) {
+
+		ArrayList<String> emptyList = new ArrayList<String>();
+		TreeView<String> taskList = createListContent(emptyList); // Create list content to be added to new tab
+		TabPane newTabPane = new TabPane();
+		newTabPane.getTabs().add(new Tab("test"));
+
+		Button newTaskButton = new Button("New Task");
+		newTaskButton.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent e) {
+				String result = doTextInputDialogue("New Task", "Name: ");
+				if (result != "") {
+					CheckBoxTreeItem<String> newTask = new CheckBoxTreeItem<String>(result);
+					taskList.getRoot().getChildren().add(0, newTask);
+					;
+					taskList.setPrefHeight(taskList.getRoot().getChildren().size() * 30);
+					taskList.setMaxHeight(100);
+					newtree.addTask(new ToDoObj(result, "", "")); // Updating data structure
+				}
+			}
+		});
+
+		Button deleteTaskButton = new Button("Delete Task");
+		deleteTaskButton.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent e) {
+
+				TreeItem<String> parent;
+				TreeItem<String> item = taskList.getSelectionModel().getSelectedItem();
+				String itemTitle = item.getValue();
+
+				parent = item.getParent(); 
+				if (parent == null) { // God tier if statement
+					// Do nothing;
+				} else {
+					parent.getChildren().remove(item);
+				}
+
+				newtree.removeTask(itemTitle); // Updating data structure
+
+				// private void removeTask() {
+//			    TreeItem<String> parent;
+//			    TreeItem<String> item = treeView.getSelectionModel().getSelectedItem();
+//			    if (item != null) {
+//			      parent = item.getParent();
+//			    } else {
+//			      parent = null;
+//			      // no item selected to be removed
+//			    }
+//			    if (parent == null) {
+//			      // System.out.println("Cannot remove the root node.");
+//			    } else {
+//			      parent.getChildren().remove(item);
+//			    }
+				// }
+
+			}
+		});
+
+		HBox buttonContainer = new HBox(newTaskButton, deleteTaskButton);
+
+		VBox tabContentContainer = new VBox(buttonContainer, taskList, newTabPane, new Label("aba"));
+		Tab newTab = new Tab(title, tabContentContainer);
+
+		return newTab;
+	}
+
+	/**
+	 * @implNote mainly used for test purposes, by refreshing the tree after
+	 *           adding/removing data you can be sure that the DataType has been
+	 *           changed accordingly
+	 */
+	private void refreshTree() {
+		tabPane.getTabs().clear();
+		tabPane.getTabs().add(recurseTabBuilder(TaskData));
+	}
+
+	/**
+	 * @param taskList : a list of elements to be displayed ArrayList(String)
 	 * @return ListView<TreeView<String>> : an element which can be added to panes
 	 */
-	private TreeView<String> createListView(ArrayList<String> taskList) {
+	private TreeView<String> createListContent(ArrayList<String> taskList) {
 
 		// Create a root to act as TreeView's base
 		CheckBoxTreeItem<String> root = new CheckBoxTreeItem<String>();

@@ -28,6 +28,11 @@ public class Tree {
 	private ArrayList<ToDoObj> TaskList = new ArrayList<ToDoObj>(); // List of tasks
 	private HashMap<String, Tree> TreeList = new HashMap<String, Tree>(); // List of other lists
 
+	/**
+	 * 
+	 * @param title
+	 * @param description
+	 */
 	public Tree(String title, String description) {
 		this.title = title;
 		this.description = description;
@@ -81,6 +86,20 @@ public class Tree {
 
 	public void addTask(ToDoObj task) {
 		TaskList.add(task);
+	}
+
+	public void removeTask(String taskTitle) {
+		int index = 0;
+		int removeIndex = -1;
+		for (ToDoObj task : TaskList) {
+			if (task.getAttribute("title") == taskTitle) {
+				removeIndex = index;
+			}
+			index++;
+		}
+		if (removeIndex != -1) {
+			TaskList.remove(removeIndex);
+		}
 	}
 
 }
