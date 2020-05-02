@@ -68,6 +68,10 @@ public class Tree {
 	public Tree getTree(String key) {
 		return TreeList.get(key);
 	}
+	
+	public void removeTab(String key) {
+		TreeList.remove(key);
+	}
 
 	// Task List
 	public ArrayList<ToDoObj> getTaskObjects() {

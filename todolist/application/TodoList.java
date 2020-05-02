@@ -11,6 +11,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -30,11 +31,13 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.StageStyle;
 
-// TODO: Persistent data
+// TODO: Persistent data (!!!!)
 // TODO: Edit descriptions under Trees
 // TODO: Test starting from no data entered.
 // TODO: Edit tasks which are already in lists
+// TODO: Add other fields (display and entry) for tasks and projects (due dates, descriptions, etc)
 // TODO: Create new top-level project button, use individual tree object for each (make project DataType)
+// TODO: When adding new project it is added backward
 
 public class TodoList {
 
@@ -43,6 +46,7 @@ public class TodoList {
 	private Node settingsPanel;
 	private TabPane TopTabPane = new TabPane();
 	private Tab TopTab;
+	private ArrayList<Tree> Projects;
 
 	List<String> tabTitles = new ArrayList<>(); // Must be initialized with = or null point probable
 
@@ -123,21 +127,46 @@ public class TodoList {
 				refreshTree(true);
 			}
 		});
+		Button newProject = new Button("New Project");
+		newProject.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent e) {
+				createNewProject(doTextInputDialogue("New Project", "Project Name: "));
+			}
+		});
 
 		// apply IDs for styling
 		settings.setId("settings_panel");
-		settings.getChildren().addAll(settingsTitle, combo_box, refreshTree);
+		settings.getChildren().addAll(settingsTitle, combo_box, refreshTree, newProject);
 
 		return settings;
 	}
 
 	private TabPane createTabPane() {
 
-		TopTab = recurseTabBuilder(TaskData);
-		TopTab.setClosable(false);
-		TopTabPane.getTabs().add(TopTab);
+//		TopTab = recurseTabBuilder(TaskData);
+//		TopTab.setClosable(false);
+//		TopTabPane.getTabs().add(TopTab);
+		
+		for (String key : TaskData.getTreeList().keySet()) {
+			Tree project = TaskData.getTree(key);
+			TopTabPane.getTabs().add(recurseTabBuilder(project));
+		}
 
 		return TopTabPane;
+	}
+	
+	/**
+	 * Creates a new project, adds its tab and its tree to their respective places.
+	 * @param projectName (String) name of new project
+	 */
+	private void createNewProject(String projectName) {
+		Tree newProject = new Tree(projectName, "");
+		Tab newProjectTab = recurseTabBuilder(newProject);
+		
+		TaskData.addTree(projectName, newProject);
+		TopTabPane.getTabs().add(newProjectTab);
+		TopTabPane.getSelectionModel().select(newProjectTab);
 	}
 
 	/**
@@ -157,6 +186,13 @@ public class TodoList {
 		for (String subTabName : topTree.getTreeList().keySet()) {
 			Tab subTab = recurseTabBuilder(topTree.getTree(subTabName));
 			tabPane.getTabs().add(subTab);
+			
+			subTab.setOnClosed(new EventHandler<Event>() {
+			    @Override
+			    public void handle(Event t) {
+			        topTree.removeTab(subTabName);
+			    }
+			});
 		}
 
 		Button newTaskButton = new Button("New Task");
@@ -201,7 +237,6 @@ public class TodoList {
 		// Create a "new tab" button by checking if last tab of tabDisplay is clicked
 		// each time tabs are changed through event listener and adding new tab at the
 		// index before it
-//		if (tabPane.getTabs().size() > 0) {
 		Button newProjectButton = new Button("Click here to begin adding subprojects to this project");
 		newProjectButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
@@ -221,7 +256,6 @@ public class TodoList {
 				}
 			}
 		});
-//		}
 
 		// Separates elements under each tab using VBox and creates the new, single tab
 		// to return
@@ -274,7 +308,10 @@ public class TodoList {
 		List<Integer> tabPath = currentTabPath(TopTabPane); // This should ideally be only if toTab but scope problems
 
 		TopTabPane.getTabs().clear();
-		TopTabPane.getTabs().add(recurseTabBuilder(TaskData));
+		for (String key : TaskData.getTreeList().keySet()) {
+			Tree project = TaskData.getTree(key);
+			TopTabPane.getTabs().add(recurseTabBuilder(project));
+		}
 
 		if (toTab) {
 			TabPane tp = TopTabPane;
@@ -284,7 +321,7 @@ public class TodoList {
 			}
 		}
 		TopTab = TopTabPane.getTabs().get(0);
-		TopTab.setClosable(false);
+//		TopTab.setClosable(false);
 	}
 
 	private List<Integer> currentTabPath(TabPane rootPane) {
