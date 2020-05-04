@@ -15,29 +15,44 @@ import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar.ButtonData;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBoxTreeItem;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeItem;
+import javafx.scene.control.TreeTableColumn;
+import javafx.scene.control.TreeTableView;
 import javafx.scene.control.TreeView;
 import javafx.scene.control.cell.CheckBoxTreeCell;
+import javafx.scene.control.cell.TextFieldTreeTableCell;
+import javafx.scene.control.cell.TreeItemPropertyValueFactory;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.StageStyle;
+import javafx.util.Callback;
 
+// Added features to do
 // TODO: Persistent data (!!!!)
 // TODO: Edit descriptions under Trees
-// TODO: Test starting from no data entered.
-// TODO: Edit tasks which are already in lists
-// TODO: Add other fields (display and entry) for tasks and projects (due dates, descriptions, etc)
-// TODO: Create new top-level project button, use individual tree object for each (make project DataType)
-// TODO: When adding new project it is added backward
+// TODO: Add other fields (*display* and entry) for tasks and projects (due dates, descriptions, etc)
+// TODO: Figure out styling
+
+// Bugs to do
+//TODO: Tree refreshes out of order (can be fixed by adding information sorting methods)
+
+// Potential future updates
+// Bar Graph which shows how many actions per day under each category (help stay on top of put off topics)
 
 public class TodoList {
 
@@ -45,8 +60,6 @@ public class TodoList {
 	private TextArea textOutput;
 	private Node settingsPanel;
 	private TabPane TopTabPane = new TabPane();
-	private Tab TopTab;
-	private ArrayList<Tree> Projects;
 
 	List<String> tabTitles = new ArrayList<>(); // Must be initialized with = or null point probable
 
@@ -121,6 +134,8 @@ public class TodoList {
 		ComboBox<String> combo_box = new ComboBox<String>(FXCollections.observableArrayList(letters));
 		Label settingsTitle = new Label("Settings");
 		Button refreshTree = new Button("Refresh Tree");
+		Tooltip toolTip = new Tooltip("(o.o) - you found me!");
+		refreshTree.setTooltip(toolTip);
 		refreshTree.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) {
@@ -131,7 +146,7 @@ public class TodoList {
 		newProject.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) {
-				createNewProject(doTextInputDialogue("New Project", "Project Name: "));
+				createNewProject(doTextInputDialog("New Project", "Project Name: "));
 			}
 		});
 
@@ -147,7 +162,7 @@ public class TodoList {
 //		TopTab = recurseTabBuilder(TaskData);
 //		TopTab.setClosable(false);
 //		TopTabPane.getTabs().add(TopTab);
-		
+
 		for (String key : TaskData.getTreeList().keySet()) {
 			Tree project = TaskData.getTree(key);
 			TopTabPane.getTabs().add(recurseTabBuilder(project));
@@ -155,18 +170,79 @@ public class TodoList {
 
 		return TopTabPane;
 	}
-	
+
 	/**
 	 * Creates a new project, adds its tab and its tree to their respective places.
+	 * 
 	 * @param projectName (String) name of new project
 	 */
 	private void createNewProject(String projectName) {
-		Tree newProject = new Tree(projectName, "");
-		Tab newProjectTab = recurseTabBuilder(newProject);
-		
-		TaskData.addTree(projectName, newProject);
-		TopTabPane.getTabs().add(newProjectTab);
-		TopTabPane.getSelectionModel().select(newProjectTab);
+		if (projectName != "") {
+			Tree newProject = new Tree(projectName, "");
+			Tab newProjectTab = recurseTabBuilder(newProject);
+
+			TaskData.addTree(projectName, newProject);
+			TopTabPane.getTabs().add(newProjectTab);
+			TopTabPane.getSelectionModel().select(newProjectTab);
+		}
+	}
+
+	/**
+	 * @param taskList : a list of elements to be displayed ArrayList(String)
+	 * @return ListView<TreeView<String>> : an element which can be added to panes
+	 */
+	private TreeTableView<ToDoObj> createListContent(ArrayList<ToDoObj> taskList) {
+
+		TreeTableView<ToDoObj> treeTableView = new TreeTableView<ToDoObj>();
+
+		TreeTableColumn<ToDoObj, String> col1 = new TreeTableColumn<>("Title");
+		TreeTableColumn<ToDoObj, String> col2 = new TreeTableColumn<>("Due Date");
+		TreeTableColumn<ToDoObj, String> col3 = new TreeTableColumn<>("Time");
+
+		col1.setCellValueFactory(new TreeItemPropertyValueFactory<>("title"));
+		col2.setCellValueFactory(new TreeItemPropertyValueFactory<>("dueDate"));
+		col3.setCellValueFactory(new TreeItemPropertyValueFactory<>("time"));
+
+		TreeItem<ToDoObj> taskListRoot = new TreeItem<ToDoObj>(new ToDoObj("Root", "filler", "text"));
+		for (ToDoObj task : taskList) {
+			TreeItem<ToDoObj> taskItem = new TreeItem<ToDoObj>(task);
+			taskListRoot.getChildren().add(taskItem);
+		}
+
+		// Super useful resource for editing treeTableCells, also shows how to do
+		// drop-down menus
+		// https://www.youtube.com/watch?v=BNvVSU9nHDY
+		col1.setCellFactory(TextFieldTreeTableCell.forTreeTableColumn());
+		col1.setOnEditCommit(new EventHandler<TreeTableColumn.CellEditEvent<ToDoObj, String>>() {
+			@Override
+			public void handle(TreeTableColumn.CellEditEvent<ToDoObj, String> event) {
+				TreeItem<ToDoObj> editingTask = treeTableView.getTreeItem(event.getTreeTablePosition().getRow());
+				editingTask.getValue().setTitle(event.getNewValue());
+			}
+		});
+		col2.setCellFactory(TextFieldTreeTableCell.forTreeTableColumn());
+		col2.setOnEditCommit(new EventHandler<TreeTableColumn.CellEditEvent<ToDoObj, String>>() {
+			@Override
+			public void handle(TreeTableColumn.CellEditEvent<ToDoObj, String> event) {
+				TreeItem<ToDoObj> editingTask = treeTableView.getTreeItem(event.getTreeTablePosition().getRow());
+				editingTask.getValue().setDueDate(event.getNewValue());
+			}
+		});
+		col3.setCellFactory(TextFieldTreeTableCell.forTreeTableColumn());
+		col3.setOnEditCommit(new EventHandler<TreeTableColumn.CellEditEvent<ToDoObj, String>>() {
+			@Override
+			public void handle(TreeTableColumn.CellEditEvent<ToDoObj, String> event) {
+				TreeItem<ToDoObj> editingTask = treeTableView.getTreeItem(event.getTreeTablePosition().getRow());
+				editingTask.getValue().setTime(event.getNewValue());
+			}
+		});
+
+		treeTableView.getColumns().addAll(col1, col2, col3);
+		treeTableView.setShowRoot(false);
+		treeTableView.setEditable(true);
+		treeTableView.setRoot(taskListRoot);
+
+		return treeTableView;
 	}
 
 	/**
@@ -177,8 +253,8 @@ public class TodoList {
 	private Tab recurseTabBuilder(Tree topTree) {
 
 		TabPane tabPane = new TabPane();
-		TreeView<String> taskList = createListContent(topTree.getTaskList()); // List content to be added to new tab
-//		taskList.setPrefHeight(taskList.getRoot().getChildren().size() * 30); // The value 30 should not be hardcoded
+		TreeTableView<ToDoObj> taskList = createListContent(topTree.getTaskObjects()); // List content to be added to
+																						// new tab
 		taskList.setMaxHeight(100);
 
 		// For each tree beneath this one call this function again. Trees with no other
@@ -186,12 +262,12 @@ public class TodoList {
 		for (String subTabName : topTree.getTreeList().keySet()) {
 			Tab subTab = recurseTabBuilder(topTree.getTree(subTabName));
 			tabPane.getTabs().add(subTab);
-			
+
 			subTab.setOnClosed(new EventHandler<Event>() {
-			    @Override
-			    public void handle(Event t) {
-			        topTree.removeTab(subTabName);
-			    }
+				@Override
+				public void handle(Event t) {
+					topTree.removeTab(subTabName);
+				}
 			});
 		}
 
@@ -199,14 +275,21 @@ public class TodoList {
 		newTaskButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) {
-				String result = doTextInputDialogue("New Task", "Name: ");
-				if (result != "") {
-					CheckBoxTreeItem<String> newTask = new CheckBoxTreeItem<String>(result);
-					taskList.getRoot().getChildren().add(0, newTask);
-					;
+//				String result = doTextInputDialogue("New Task", "Name: ");
+
+				Optional dialog = createToDoInput().showAndWait();
+				if (dialog.isPresent()) {
+					ToDoObj newToDo = (ToDoObj) dialog.get();
+
+					String newToDoName = newToDo.getAttribute("title");
+					if (newToDoName.length() > 0) {
+						TreeItem newTask = new TreeItem(newToDo);
+						taskList.getRoot().getChildren().add(0, newTask);
+						;
 //					taskList.setPrefHeight(taskList.getRoot().getChildren().size() * 30);
-					taskList.setMaxHeight(100);
-					topTree.addTask(new ToDoObj(result, "", "")); // Updating data structure
+						taskList.setMaxHeight(100);
+						topTree.addTask(newToDo); // Updating data structure
+					}
 				}
 			}
 		});
@@ -216,9 +299,9 @@ public class TodoList {
 			@Override
 			public void handle(ActionEvent e) {
 
-				TreeItem<String> parent;
-				TreeItem<String> item = taskList.getSelectionModel().getSelectedItem();
-				String itemTitle = item.getValue();
+				TreeItem<ToDoObj> parent;
+				TreeItem<ToDoObj> item = taskList.getSelectionModel().getSelectedItem();
+				String itemTitle = item.getValue().getAttribute("title");
 
 				parent = item.getParent();
 				if (parent == null) { // God tier if statement
@@ -259,7 +342,6 @@ public class TodoList {
 
 		// Separates elements under each tab using VBox and creates the new, single tab
 		// to return
-//		VBox listTabContainer = new VBox(new Label(toptree.getDescription()), new Button("Add SubCategories"), tabPane, taskList);
 		VBox listTabContainer = new VBox(new Label(topTree.getDescription()), buttonContainer, taskList, tabPane);
 		Tab newTab = new Tab(topTree.getTitle(), listTabContainer);
 
@@ -268,7 +350,7 @@ public class TodoList {
 
 	private void newTabButton(TabPane tabPane, Tree topTree, Boolean newProjectButton) {
 		if (tabPane.getTabs().size() > 1 || newProjectButton) {
-			String result = doTextInputDialogue("New Project:", "Title: ");
+			String result = doTextInputDialog("New Project:", "Title: ");
 			if (result != "") {
 				Tree newTree = new Tree(result, "");
 				topTree.addTree(result, newTree);
@@ -281,17 +363,19 @@ public class TodoList {
 	}
 
 	/**
+	 * A normal text input pop-up
+	 * 
 	 * @param header  : appears in center of window
 	 * @param content : appears beside input box
 	 */
-	private String doTextInputDialogue(String header, String content) {
+	private String doTextInputDialog(String header, String content) {
 		TextInputDialog dialog = new TextInputDialog("");
 //		dialog.setTitle("New project"); // Title removed when StageStyle.UNDECORATED
 		dialog.setHeaderText(header);
 		dialog.setContentText(content);
 		dialog.initStyle(StageStyle.UNDECORATED); // THIS GETS RID OF BORDERS AROUND WINDOWS!!!!!!!!!!
 		Optional<String> result = dialog.showAndWait(); // Get response value from dialogue
-		if (result.isPresent() && result.get().length() > 0) {
+		if (result.isPresent() && !result.isEmpty() && result.get().length() > 0) {
 			return result.get();
 		} else {
 			return "";
@@ -299,6 +383,61 @@ public class TodoList {
 	}
 
 	/**
+	 * Creates a dialog which returns a ToDoObj on close. Edit arrays to change
+	 * default display values
+	 * 
+	 * @return Dialog object
+	 */
+	private Dialog createToDoInput() {
+		ArrayList<String> labels = new ArrayList<String>() {
+			{ // Makes a label element for each string in here
+				add("Task Name");
+				add("Due Date");
+				add("Time");
+			}
+		};
+
+		ArrayList<TextField> elements = new ArrayList<TextField>() {
+			{
+				add(new TextField());
+				add(new TextField());
+				add(new TextField());
+			}
+		};
+
+		Dialog<ToDoObj> dialog = new Dialog<ToDoObj>();
+		GridPane gridPane = new GridPane();
+
+		for (int i = 0; i < labels.size(); i++) { // Adding elements to gridPane
+			Label label = new Label(labels.get(i));
+			TextField element = elements.get(i);
+			gridPane.add(label, i, 1);
+			gridPane.add(element, i, 2);
+		}
+
+		ButtonType buttonTypeOk = new ButtonType("Ok", ButtonData.OK_DONE);
+		ButtonType buttonTypeCancel = new ButtonType("Cancel", ButtonData.CANCEL_CLOSE);
+		dialog.getDialogPane().getButtonTypes().addAll(buttonTypeOk, buttonTypeCancel);
+
+		dialog.getDialogPane().setContent(gridPane);
+		dialog.setResultConverter(new Callback<ButtonType, ToDoObj>() {
+			@Override
+			public ToDoObj call(ButtonType b) {
+
+				if (b == buttonTypeOk) {
+					return new ToDoObj(elements.get(0).getText(), elements.get(1).getText(), elements.get(2).getText());
+				}
+
+				return null;
+			}
+		});
+
+		return dialog;
+	}
+
+	/**
+	 * Reloads the tree from database
+	 * 
 	 * @param toTab : When refreshing the tree, it will default to the first element
 	 *              of each tab, by setting boolean to true, preserve user's spot in
 	 *              the hierarchy
@@ -320,7 +459,7 @@ public class TodoList {
 				tp = (TabPane) tp.getSelectionModel().getSelectedItem().getContent().lookup(".tab-pane");
 			}
 		}
-		TopTab = TopTabPane.getTabs().get(0);
+//		TopTab = TopTabPane.getTabs().get(0);
 //		TopTab.setClosable(false);
 	}
 
@@ -339,232 +478,4 @@ public class TodoList {
 		return tabPath;
 	}
 
-	/**
-	 * @param taskList : a list of elements to be displayed ArrayList(String)
-	 * @return ListView<TreeView<String>> : an element which can be added to panes
-	 */
-	private TreeView<String> createListContent(ArrayList<String> taskList) {
-
-		// Create a root to act as TreeView's base
-		CheckBoxTreeItem<String> root = new CheckBoxTreeItem<String>();
-		root.setExpanded(true);
-		for (String task : taskList) {
-			root.getChildren().add(new CheckBoxTreeItem<String>(task));
-		}
-
-		// TreeView, not showing base root
-		final TreeView<String> listView = new TreeView<String>();
-		listView.setCellFactory(CheckBoxTreeCell.<String>forTreeView());
-		listView.setRoot(root);
-		listView.setShowRoot(false);
-
-		return listView;
-	}
-
 }
-
-//  private TreeView<String> createTree() {
-//    // create the tree model
-//    List<CheckBoxTreeItem<String>> subtasks = new ArrayList<>();
-//
-//    for (int i = 0; i < 5; i++) {
-//      subtasks.add(new CheckBoxTreeItem<String>("Subtask " + i));
-//    }
-//    CheckBoxTreeItem<String> root = new CheckBoxTreeItem<String>();
-//    root.setExpanded(true);
-//    root.getChildren().addAll(subtasks);
-//
-//    // create the treeView
-//    final TreeView<String> treeView = new TreeView<String>();
-//    treeView.setRoot(root);
-//    treeView.setShowRoot(false);
-//
-//    // set the cell factory
-////    treeView.setCellFactory(CheckBoxTreeCell.<String>forTreeView());
-//    
-//    
-//    // Uses https://docs.oracle.com/javafx/2/ui_controls/tree-view.htm#BABEJCHA as refrence
-//    // for a new cell factory
-//    treeView.setEditable(true);
-//    treeView.setCellFactory(new Callback<TreeView<String>,TreeCell<String>>(){
-//        @Override
-//        public TreeCell<String> call(TreeView<String> p) {
-//            return new TextFieldTreeCellImpl();
-//        }
-//    });
-//
-//    return treeView;
-//  }
-
-//  private final class TextFieldTreeCellImpl extends TreeCell<String> {
-// 	 
-//      private TextField textField;
-//
-//      public TextFieldTreeCellImpl() {
-//      }
-//
-//      @Override
-//      public void startEdit() {
-//          super.startEdit();
-//
-//          if (textField == null) {
-//              createTextField();
-//          }
-//          setText(null);
-//          setGraphic(textField);
-//          textField.selectAll();
-//      }
-//
-//      @Override
-//      public void cancelEdit() {
-//          super.cancelEdit();
-//          setText((String) getItem());
-//          setGraphic(getTreeItem().getGraphic());
-//      }
-//
-//      @Override
-//      public void updateItem(String item, boolean empty) {
-//          super.updateItem(item, empty);
-//
-//          if (empty) {
-//              setText(null);
-//              setGraphic(null);
-//          } else {
-//              if (isEditing()) {
-//                  if (textField != null) {
-//                      textField.setText(getString());
-//                  }
-//                  setText(null);
-//                  setGraphic(textField);
-//              } else {
-//                  setText(getString());
-//                  setGraphic(getTreeItem().getGraphic());
-//              }
-//          }
-//      }
-//
-//      private void createTextField() {
-//          textField = new TextField(getString());
-//          textField.setOnKeyReleased(new EventHandler<KeyEvent>() {
-//
-//              @Override
-//              public void handle(KeyEvent t) {
-//                  if (t.getCode() == KeyCode.ENTER) {
-//                      commitEdit(textField.getText());
-//                  } else if (t.getCode() == KeyCode.ESCAPE) {
-//                      cancelEdit();
-//                  }
-//              }
-//          });
-//      }
-//
-//      private String getString() {
-//          return getItem() == null ? "" : getItem().toString();
-//      }
-//  }
-
-//  private Node createDisplayPane() {
-//
-//    treeView = createTree();
-//	  
-//
-//    VBox pane = new VBox();
-//    TextField taskName = new TextField("Task Name");
-//    HBox buttons = new HBox();
-//    Button addTaskBtn = new Button("Add Task");
-//    Button removeTaskBtn = new Button("Remove Selected Task");
-//    Button clearAllBtn = new Button("Clear All");
-//    Button clearCheckedBtn = new Button("Clear Checked");
-//    textOutput = new TextArea();
-//    textOutput.setEditable(false);
-//
-//    buttons.getChildren().addAll(addTaskBtn, removeTaskBtn, clearCheckedBtn, clearAllBtn);
-//    pane.getChildren().addAll(taskName, buttons, treeView, textOutput);
-//
-//    Image bgImg = new Image("file:backgroundPattern.JPEG", true);
-//    BackgroundImage background = new BackgroundImage(bgImg, BackgroundRepeat.REPEAT,
-//        BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT, BackgroundSize.DEFAULT);
-//    pane.setBackground(new Background(background));
-//
-//    addTaskBtn.setOnAction(new EventHandler<ActionEvent>() {
-//      @Override
-//      public void handle(ActionEvent event) {
-//        addTask(taskName.getText());
-//      }
-//    });
-//
-//    removeTaskBtn.setOnAction(new EventHandler<ActionEvent>() {
-//      @Override
-//      public void handle(ActionEvent event) {
-//        removeTask();
-//      }
-//    });
-//
-//    clearAllBtn.setOnAction(new EventHandler<ActionEvent>() {
-//      @Override
-//      public void handle(ActionEvent event) {
-//        List<TreeItem<String>> removalList = new ArrayList<>();
-//        for (TreeItem<String> item : treeView.getRoot().getChildren()) {
-//          removalList.add(item);
-//        }
-//        treeView.getRoot().getChildren().removeAll(removalList);
-//      }
-//    });
-//
-//    clearCheckedBtn.setOnAction(new EventHandler<ActionEvent>() {
-//      @Override
-//      public void handle(ActionEvent event) {
-//        List<TreeItem<String>> removalList = new ArrayList<>();
-//        for (TreeItem<String> item : treeView.getRoot().getChildren()) {
-//          if (((CheckBoxTreeItem<String>) item).isSelected()) {
-//            removalList.add(item);
-//          }
-//          recursiveClearCheckedHelper(item);
-//        }
-//        treeView.getRoot().getChildren().removeAll(removalList);
-//      }
-//    });
-//
-//    return pane;
-//  }
-
-//  private void recursiveClearCheckedHelper(TreeItem<String> node) {
-//    List<TreeItem<String>> removalList = new ArrayList<>();
-//    for (TreeItem<String> item : node.getChildren()) {
-//      if (((CheckBoxTreeItem<String>) item).isSelected()) {
-//        removalList.add(item);
-//      }
-//      recursiveClearCheckedHelper(item);
-//    }
-//    node.getChildren().removeAll(removalList);
-//  }
-//
-//  private void addTask(String value) {
-//    TreeItem<String> parent = treeView.getSelectionModel().getSelectedItem();
-//    CheckBoxTreeItem<String> newTask = new CheckBoxTreeItem<String>(value);
-//    if (parent == null || treeView.getTreeItemLevel(parent) == 0) {
-//      parent = treeView.getRoot();
-//    }
-//    parent.getChildren().add(newTask);
-//    if (!parent.isExpanded()) {
-//      parent.setExpanded(true);
-//    }
-//  }
-//
-//  private void removeTask() {
-//    TreeItem<String> parent;
-//    TreeItem<String> item = treeView.getSelectionModel().getSelectedItem();
-//    if (item != null) {
-//      parent = item.getParent();
-//    } else {
-//      parent = null;
-//      // no item selected to be removed
-//    }
-//    if (parent == null) {
-//      // System.out.println("Cannot remove the root node.");
-//    } else {
-//      parent.getChildren().remove(item);
-//    }
-//  }
-//
-//}

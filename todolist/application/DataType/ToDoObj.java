@@ -7,25 +7,51 @@ import java.util.HashMap;
 public class ToDoObj {
 	
 	private HashMap<String,String> attributes;
+	private String title = null;
+	private String dueDate = null;
+	private String time = null;
 	
 	/** 
 	Base DataType for storing event data
 	@param title : name of event 
 	@param dueDate : event deadline / target completion date
-	@param timeAdded : time added TODO: determine format
+	@param time : time added TODO: determine format
 	*/
 	
-	public ToDoObj(String title, String dueDate, String timeAdded){
+	public ToDoObj(String title, String dueDate, String time){
 		this.attributes = new HashMap<String, String>() {{
 			put("title", title);
 			put("dueDate", dueDate);
-			put("timeAdded", timeAdded);
+			put("time", time);
 		}};
+		this.title = title;
+		this.dueDate = dueDate;
+		this.time = time;
 	  }
 	
-//	public HashMap<String, String> getAttributes() {
-//		return attributes;
-//	}
+	public String getTitle() {
+		return title;
+	}
+	
+	public void setTitle(String newTitle) {
+		title = newTitle;
+	}
+	
+	public String getDueDate() {
+		return dueDate;
+	}
+	
+	public void setDueDate(String newDueDate) {
+		dueDate = newDueDate;
+	}
+	
+	public String getTime() {
+		return time;
+	}
+	
+	public void setTime(String newTime) {
+		time = newTime;
+	}
 	
 	public String getAttribute(String key) {
 		String attributeValue = attributes.get(key);

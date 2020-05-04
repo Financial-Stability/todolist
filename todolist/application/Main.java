@@ -18,7 +18,8 @@ public class Main extends Application {
 
     // set the scene
     Scene mainScene = new Scene(createPane(), WINDOW_WIDTH, WINDOW_HEIGHT);
-    mainScene.getStylesheets().add(getClass().getResource("stylesheet.css").toString());
+//    mainScene.getStylesheets().add(getClass().getResource("stylesheet.css").toString());
+    mainScene.getStylesheets().add("/Resources/ToDoTheme.css");
 
     // set the stage
     stage.setTitle(APP_TITLE);
