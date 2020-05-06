@@ -1,5 +1,7 @@
 package application;
 
+import java.io.Serializable;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
@@ -47,12 +49,16 @@ import javafx.util.Callback;
 // TODO: Edit descriptions under Trees
 // TODO: Add other fields (*display* and entry) for tasks and projects (due dates, descriptions, etc)
 // TODO: Figure out styling
+// TODO: Add Date/Time Selectors
+// TODO: Deal with application resizing
 
 // Bugs to do
 //TODO: Tree refreshes out of order (can be fixed by adding information sorting methods)
 
 // Potential future updates
 // Bar Graph which shows how many actions per day under each category (help stay on top of put off topics)
+// For web use AJAX? (https://www.w3schools.com/js/js_ajax_intro.asp)
+// JSON vs MongoDB (https://stackshare.io/stackups/json-vs-mongodb) : JSON better for beginner projects
 
 public class TodoList {
 
