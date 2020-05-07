@@ -9,6 +9,7 @@ import java.util.Optional;
 
 import application.DataType.ToDoObj;
 import application.DataType.Tree;
+
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -45,20 +46,22 @@ import javafx.stage.StageStyle;
 import javafx.util.Callback;
 
 // Added features to do
-// TODO: Persistent data (!!!!)
 // TODO: Edit descriptions under Trees
 // TODO: Add other fields (*display* and entry) for tasks and projects (due dates, descriptions, etc)
 // TODO: Figure out styling
 // TODO: Add Date/Time Selectors
 // TODO: Deal with application resizing
+// TODO: Add CheckBoxes
+// TODO: Add descriptions to tasks
 
 // Bugs to do
-//TODO: Tree refreshes out of order (can be fixed by adding information sorting methods)
+// TODO: Tree refreshes out of order (can be fixed by adding information sorting methods)
 
 // Potential future updates
 // Bar Graph which shows how many actions per day under each category (help stay on top of put off topics)
 // For web use AJAX? (https://www.w3schools.com/js/js_ajax_intro.asp)
 // JSON vs MongoDB (https://stackshare.io/stackups/json-vs-mongodb) : JSON better for beginner projects
+// Add selector for which tree to load (data can be switched by saving multiple diffrent .ser files)
 
 public class TodoList {
 
@@ -74,34 +77,34 @@ public class TodoList {
 
 	public TodoList() {
 
-		// Filler Data
-		Tree school = new Tree("school", "");
-		school.addTask(new ToDoObj("Do Homework", "11/14/20", "13:07"));
-		school.addTask(new ToDoObj("Clear Whiteboard", "11/12/20", "14:23"));
-		Tree project1 = new Tree("Project1", "Research and propose an environmental system");
-		project1.addTask(new ToDoObj("Meet group members", "11/2/20", "5:10"));
-		project1.addTask(new ToDoObj("Write proposal", "11/2/20", "5:10"));
-		school.addTree("project1", project1);
-		TaskData.addTree("school", school);
-
-		Tree home = new Tree("home", "Things to be done around the house");
-		home.addTask(new ToDoObj("Do dishes", "fa", "14:23"));
-		home.addTask(new ToDoObj("Feed dog", "ada", "14:23"));
-		home.addTask(new ToDoObj("Wipe counter", "adfa", "14:23"));
-		Tree shootBird = new Tree("Shoot that annoying bird outside my window", "He tweet very loud");
-		shootBird.addTask(new ToDoObj("Triangulate position", "12/5/21", "14:23"));
-		shootBird.addTask(new ToDoObj("Calculate bullet trajectory", "1/1/41", "14:23"));
-		shootBird.addTask(new ToDoObj("Start oven", "1/1/41", "14:23"));
-		home.addTree("Shoot Bird", shootBird);
-		Tree buildDeck = new Tree("Build Deck", "");
-		buildDeck.addTask(new ToDoObj("Buy wood", "12/5/21", "14:23"));
-		buildDeck.addTask(new ToDoObj("Buy nails", "1/1/41", "14:23"));
-		Tree talkToJim = new Tree("Talk to jim", "He knows how to build decks, he's deaf though");
-		talkToJim.addTask(new ToDoObj("Learn to speak sign language", "", ""));
-		talkToJim.addTask(new ToDoObj("Kill Jim.", "", ""));
-		buildDeck.addTree("Talk to Jim", talkToJim);
-		home.addTree("Build Deck", buildDeck);
-		TaskData.addTree("home", home);
+//		// Filler Data
+//		Tree school = new Tree("school", "");
+//		school.addTask(new ToDoObj("Do Homework", "11/14/20", "13:07"));
+//		school.addTask(new ToDoObj("Clear Whiteboard", "11/12/20", "14:23"));
+//		Tree project1 = new Tree("Project1", "Research and propose an environmental system");
+//		project1.addTask(new ToDoObj("Meet group members", "11/2/20", "5:10"));
+//		project1.addTask(new ToDoObj("Write proposal", "11/2/20", "5:10"));
+//		school.addTree("project1", project1);
+//		TaskData.addTree("school", school);
+//
+//		Tree home = new Tree("home", "Things to be done around the house");
+//		home.addTask(new ToDoObj("Do dishes", "fa", "14:23"));
+//		home.addTask(new ToDoObj("Feed dog", "ada", "14:23"));
+//		home.addTask(new ToDoObj("Wipe counter", "adfa", "14:23"));
+//		Tree shootBird = new Tree("Shoot that annoying bird outside my window", "He tweet very loud");
+//		shootBird.addTask(new ToDoObj("Triangulate position", "12/5/21", "14:23"));
+//		shootBird.addTask(new ToDoObj("Calculate bullet trajectory", "1/1/41", "14:23"));
+//		shootBird.addTask(new ToDoObj("Start oven", "1/1/41", "14:23"));
+//		home.addTree("Shoot Bird", shootBird);
+//		Tree buildDeck = new Tree("Build Deck", "");
+//		buildDeck.addTask(new ToDoObj("Buy wood", "12/5/21", "14:23"));
+//		buildDeck.addTask(new ToDoObj("Buy nails", "1/1/41", "14:23"));
+//		Tree talkToJim = new Tree("Talk to jim", "He knows how to build decks, he's deaf though");
+//		talkToJim.addTask(new ToDoObj("Learn to speak sign language", "", ""));
+//		talkToJim.addTask(new ToDoObj("Kill Jim.", "", ""));
+//		buildDeck.addTree("Talk to Jim", talkToJim);
+//		home.addTree("Build Deck", buildDeck);
+//		TaskData.addTree("home", home);
 
 //		System.out.println(TaskData.getTree("home").getTitle()); // Typical call to DataStructure
 
@@ -124,6 +127,14 @@ public class TodoList {
 
 	public void output(String message) {
 		textOutput.appendText(message + "\n");
+	}
+
+	public Tree getTaskData() {
+		return TaskData;
+	}
+
+	public void setTaskData(Tree tree) {
+		this.TaskData = tree;
 	}
 
 	/**
@@ -171,7 +182,17 @@ public class TodoList {
 
 		for (String key : TaskData.getTreeList().keySet()) {
 			Tree project = TaskData.getTree(key);
-			TopTabPane.getTabs().add(recurseTabBuilder(project));
+			Tab projectTab = recurseTabBuilder(project);
+
+			projectTab.setOnClosed(new EventHandler<Event>() {
+				@Override
+				public void handle(Event t) {
+					System.out.print("remobe");
+					TaskData.removeTree(key);
+				}
+			});
+
+			TopTabPane.getTabs().add(projectTab);
 		}
 
 		return TopTabPane;
@@ -272,7 +293,7 @@ public class TodoList {
 			subTab.setOnClosed(new EventHandler<Event>() {
 				@Override
 				public void handle(Event t) {
-					topTree.removeTab(subTabName);
+					topTree.removeTree(subTabName);
 				}
 			});
 		}
@@ -448,20 +469,31 @@ public class TodoList {
 	 *              of each tab, by setting boolean to true, preserve user's spot in
 	 *              the hierarchy
 	 */
-	private void refreshTree(Boolean toTab) {
+	public void refreshTree(Boolean toTab) {
 
 		List<Integer> tabPath = currentTabPath(TopTabPane); // This should ideally be only if toTab but scope problems
+//		if (tabPath.size() < 2) {
+//			tabPath = new ArrayList<Integer>();
+//		}
 
 		TopTabPane.getTabs().clear();
 		for (String key : TaskData.getTreeList().keySet()) {
 			Tree project = TaskData.getTree(key);
-			TopTabPane.getTabs().add(recurseTabBuilder(project));
+			Tab projectTab = recurseTabBuilder(project);
+			projectTab.setOnClosed(new EventHandler<Event>() {
+				@Override
+				public void handle(Event t) {
+					TaskData.removeTree(key);
+				}
+			});
+			TopTabPane.getTabs().add(projectTab);
 		}
 
-		if (toTab) {
+		if (toTab && tabPath.get(0) != -1) { // -1 means nothing there
 			TabPane tp = TopTabPane;
 			for (int i : tabPath) {
 				tp.getSelectionModel().select(i);
+//				System.out.println(tabPath);
 				tp = (TabPane) tp.getSelectionModel().getSelectedItem().getContent().lookup(".tab-pane");
 			}
 		}
@@ -470,16 +502,24 @@ public class TodoList {
 	}
 
 	private List<Integer> currentTabPath(TabPane rootPane) {
+
 		List<Integer> tabPath = new ArrayList<Integer>();
 
 		// Get selected index
 		tabPath.add(rootPane.getSelectionModel().getSelectedIndex());
 
-		// Get next object
-		TabPane nextTabPane = (TabPane) rootPane.getSelectionModel().getSelectedItem().getContent().lookup(".tab-pane");
-		if (nextTabPane.getTabs().size() > 1) { // If next pane isn't the bottom of the tree,
-			tabPath.addAll(currentTabPath(nextTabPane));
+		try { // Returns null point when tab pane doesn't exist (typically when starting
+				// application)
+				// Get next object
+			TabPane nextTabPane = (TabPane) rootPane.getSelectionModel().getSelectedItem().getContent()
+					.lookup(".tab-pane");
+			if (nextTabPane.getTabs().size() > 1) { // If next pane isn't the bottom of the tree,
+				tabPath.addAll(currentTabPath(nextTabPane));
+			}
+		} catch (NullPointerException ex) {
+			System.out.print(ex);
 		}
+		System.out.println(tabPath);
 
 		return tabPath;
 	}

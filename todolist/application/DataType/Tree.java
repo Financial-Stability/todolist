@@ -1,7 +1,13 @@
 package application.DataType;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import application.PersistentData.TreeSerializer;
 
 // Used reference:
 // https://stackoverflow.com/questions/23673180/create-generic-tree-with-more-than-two-child-each-may-have-unique-proprties
@@ -21,15 +27,14 @@ import java.util.HashMap;
  * through sub task and tree lists)
  */
 
-public class Tree {
+public class Tree implements Serializable {
 
 	private String title; // Name of list
 	private String description; // Notes/Description of list
 	private ArrayList<ToDoObj> TaskList = new ArrayList<ToDoObj>(); // List of tasks
 	private HashMap<String, Tree> TreeList = new HashMap<String, Tree>(); // List of other lists
-
+	
 	/**
-	 * 
 	 * @param title
 	 * @param description
 	 */
@@ -37,7 +42,7 @@ public class Tree {
 		this.title = title;
 		this.description = description;
 	}
-
+	
 	// Title
 	public String getTitle() {
 		return title;
@@ -69,7 +74,7 @@ public class Tree {
 		return TreeList.get(key);
 	}
 	
-	public void removeTab(String key) {
+	public void removeTree(String key) {
 		TreeList.remove(key);
 	}
 
