@@ -1,15 +1,16 @@
 package application.DataType;
 
-import java.util.HashMap;
+import java.io.Serializable;
 
 // Possibly add recurring tasks in future
 
-public class ToDoObj {
+public class ToDoObj implements Serializable {
 	
-	private HashMap<String,String> attributes;
+//	private HashMap<String,String> attributes;
 	private String title = null;
 	private String dueDate = null;
 	private String time = null;
+	private Boolean completed = null;
 	
 	/** 
 	Base DataType for storing event data
@@ -19,14 +20,10 @@ public class ToDoObj {
 	*/
 	
 	public ToDoObj(String title, String dueDate, String time){
-		this.attributes = new HashMap<String, String>() {{
-			put("title", title);
-			put("dueDate", dueDate);
-			put("time", time);
-		}};
 		this.title = title;
 		this.dueDate = dueDate;
 		this.time = time;
+		this.completed = false;
 	  }
 	
 	public String getTitle() {
@@ -53,13 +50,12 @@ public class ToDoObj {
 		time = newTime;
 	}
 	
-	public String getAttribute(String key) {
-		String attributeValue = attributes.get(key);
-		return attributeValue;
+	public Boolean isCompleted() {
+		return completed;
 	}
 	
-	public void setAttribute(String attribute, String value) {
-		this.attributes.put(attribute, value);
+	public void setCompleted(Boolean a) {
+		completed = a;
 	}
 	
 }

@@ -46,14 +46,14 @@ public class Main extends Application {
 		dm = new DisplayManager();
 		tl = new TodoList();
 		ts = new TreeSerializer();
-		
+
 		Tree memoryHeldTaskData = ts.deserializeTree("serialStorage.ser");
 		if (memoryHeldTaskData != null) {
-//		treeSerializer.serializeTree(new Tree("suc",  "descirption"), "testSerial.ser");
-		tl.setTaskData(memoryHeldTaskData);
-		tl.refreshTree(false);
+			tl.setTaskData(memoryHeldTaskData);
+			tl.refreshTree(false);
 		} else {
-			Tree defaultTree = new Tree("Default Tree", "This tree is created when no file with saved data is refrenced");
+			Tree defaultTree = new Tree("Default Tree",
+					"This tree is created when no file with saved data is refrenced");
 			tl.setTaskData(defaultTree);
 		}
 

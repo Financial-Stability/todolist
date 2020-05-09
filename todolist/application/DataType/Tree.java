@@ -1,13 +1,8 @@
 package application.DataType;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
-
-import application.PersistentData.TreeSerializer;
 
 // Used reference:
 // https://stackoverflow.com/questions/23673180/create-generic-tree-with-more-than-two-child-each-may-have-unique-proprties
@@ -87,7 +82,7 @@ public class Tree implements Serializable {
 
 		ArrayList<String> taskList = new ArrayList<String>();
 		for (ToDoObj obj : TaskList) {
-			taskList.add(obj.getAttribute("title"));
+			taskList.add(obj.getTitle());
 		}
 
 		return taskList;
@@ -101,7 +96,7 @@ public class Tree implements Serializable {
 		int index = 0;
 		int removeIndex = -1;
 		for (ToDoObj task : TaskList) {
-			if (task.getAttribute("title") == taskTitle) {
+			if (task.getTitle() == taskTitle) {
 				removeIndex = index;
 			}
 			index++;

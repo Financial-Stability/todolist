@@ -1,7 +1,5 @@
 package application;
 
-import java.io.Serializable;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
@@ -9,18 +7,18 @@ import java.util.Optional;
 
 import application.DataType.ToDoObj;
 import application.DataType.Tree;
-
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.CheckBoxTreeItem;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
@@ -32,27 +30,23 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeItem;
+import javafx.scene.control.TreeTableCell;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableView;
-import javafx.scene.control.TreeView;
-import javafx.scene.control.cell.CheckBoxTreeCell;
+import javafx.scene.control.cell.CheckBoxTreeTableCell;
 import javafx.scene.control.cell.TextFieldTreeTableCell;
 import javafx.scene.control.cell.TreeItemPropertyValueFactory;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.StageStyle;
 import javafx.util.Callback;
 
 // Added features to do
-// TODO: Edit descriptions under Trees
-// TODO: Add other fields (*display* and entry) for tasks and projects (due dates, descriptions, etc)
-// TODO: Figure out styling
-// TODO: Add Date/Time Selectors
-// TODO: Deal with application resizing
-// TODO: Add CheckBoxes
+// TODO: Edit/Add descriptions under Trees
 // TODO: Add descriptions to tasks
+// TODO: Add Date/Time Selectors
+// TODO: Figure out styling
 
 // Bugs to do
 // TODO: Tree refreshes out of order (can be fixed by adding information sorting methods)
@@ -222,10 +216,17 @@ public class TodoList {
 
 		TreeTableView<ToDoObj> treeTableView = new TreeTableView<ToDoObj>();
 
+		TreeTableColumn<ToDoObj, Boolean> col0 = new TreeTableColumn<ToDoObj, Boolean>(" ");
 		TreeTableColumn<ToDoObj, String> col1 = new TreeTableColumn<>("Title");
 		TreeTableColumn<ToDoObj, String> col2 = new TreeTableColumn<>("Due Date");
 		TreeTableColumn<ToDoObj, String> col3 = new TreeTableColumn<>("Time");
 
+//		ObservableList<ToDoObj> cellData = FXCollections.observableArrayList();
+//		taskList.forEach(task -> {
+//			cellData.add(task);
+//		});
+
+		col0.setCellValueFactory(new TreeItemPropertyValueFactory<ToDoObj, Boolean>("completed"));
 		col1.setCellValueFactory(new TreeItemPropertyValueFactory<>("title"));
 		col2.setCellValueFactory(new TreeItemPropertyValueFactory<>("dueDate"));
 		col3.setCellValueFactory(new TreeItemPropertyValueFactory<>("time"));
@@ -239,6 +240,115 @@ public class TodoList {
 		// Super useful resource for editing treeTableCells, also shows how to do
 		// drop-down menus
 		// https://www.youtube.com/watch?v=BNvVSU9nHDY
+		// You can add collumns to collumns : https://o7planning.org/en/11149/javafx-treetableview-tutorial
+
+		
+	       col0.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<ToDoObj, Boolean>, //
+	    	        ObservableValue<Boolean>>() {
+	    	 
+	    	            @Override
+	    	            public ObservableValue<Boolean> call(TreeTableColumn.CellDataFeatures<ToDoObj, Boolean> param) {
+	    	                TreeItem<ToDoObj> treeItem = param.getValue();
+	    	                ToDoObj emp = treeItem.getValue();
+	    	                SimpleBooleanProperty booleanProp= new SimpleBooleanProperty(emp.isCompleted());
+	    	                
+	    	                // Note: singleCol.setOnEditCommit(): Not work for
+	    	                // CheckBoxTreeTableCell.
+	    	                // When "Single?" column change.
+	    	                booleanProp.addListener(new ChangeListener<Boolean>() {
+	    	 
+	    	                    @Override
+	    	                    public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue,
+	    	                            Boolean newValue) {
+	    	                        emp.setCompleted(newValue);
+	    	                        System.out.println(newValue);
+	    	                    }                     
+	    	                });
+	    	                return booleanProp;
+	    	            }
+	    	        });
+	       
+	         col0.setCellFactory(new Callback<TreeTableColumn<ToDoObj,Boolean>,TreeTableCell<ToDoObj,Boolean>>() {
+	             @Override
+	             public TreeTableCell<ToDoObj,Boolean> call( TreeTableColumn<ToDoObj,Boolean> p ) {
+	                 CheckBoxTreeTableCell<ToDoObj,Boolean> cell = new CheckBoxTreeTableCell<ToDoObj,Boolean>();
+	                 cell.setAlignment(Pos.CENTER);
+	                 return cell;
+	             }
+	         });
+		
+//		col0.setCellFactory(CheckBoxTreeTableCell.forTreeTableColumn(col0));
+//		col0.setCellFactory(CheckBoxTreeTableCell.forTreeTableColumn(col0));
+		
+//		col0.setCellFactory(CheckBoxTreeTableCell.forTreeTableColumn(col0));
+//	    col0.setCellValueFactory(param -> {
+//            if(param.getValue().getValue() > 5) {
+//                return new SimpleBooleanProperty(true);
+//            } else {
+//                return new SimpleBooleanProperty(false);
+//            }
+//        });
+		
+//		 class BoundCheckBoxCell extends CheckBoxTreeTableCell<ToDoObj, Boolean> {
+//		 
+//	     public BoundCheckBoxCell() {
+//	    	 
+//	    	 System.out.print(itemProperty().getValue().booleanValue());
+////	         textProperty().bind(itemProperty());
+//	     }
+//	     
+//	 }
+		
+//		col0.setCellFactory(BoundCheckBoxCell.forTreeTableColumn(new Callback<Integer, ObservableValue<Boolean>>() {
+//			@Override
+//			public ObservableValue<Boolean> call(Integer param) {
+//				System.out.println(param);
+//				return null;
+//			}
+//		}));
+//		
+//      col0.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<ToDoObj,Boolean>,ObservableValue<Boolean>>() {
+//
+//		@Override
+//		public ObservableValue<Boolean> call(CellDataFeatures<ToDoObj, Boolean> arg0) {
+//			// TODO Auto-generated method stub 
+//			System.out.println(arg0);
+//			return null;
+//		}
+//    	  
+//      });
+		
+//		col0.setCellFactory(CheckBoxTreeTableCell(new CallBack<TreeTableColumn<ToDoObj>, ObservableProperty<Boolean>>, null));
+		 
+//		col0.setCellFactory(new Callback<TreeTableColumn<ToDoObj,Boolean>,TreeTableCell<ToDoObj,Boolean>>() {
+//
+//			@Override
+//			public TreeTableCell<ToDoObj, Boolean> call(TreeTableColumn<ToDoObj, Boolean> param) {
+//				// TODO Auto-generated method stub
+////				param.get
+//				System.out.println(param);
+//				return null;
+//			}
+//		});
+		
+//		col0.setCellFactory(BoundCheckBoxCell.forTreeTableColumn(col0));
+
+//		new callback<Integer, ObservableValue<Boolean>>,boolean
+
+//        col0.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<ToDoObj,Boolean>,ObservableValue<Boolean>>() {
+//        	
+//			@Override
+//			public ObservableValue<Boolean> call(CellDataFeatures<ToDoObj, Boolean> arg0) {
+//				System.out.println(arg0.getTreeTableColumn());
+//				arg0.getValue().getValue();
+//				arg0.getTreeTableColumn();
+//				System.out.print(new ReadOnlyBooleanWrapper(arg0.getValue().getValue().completionStatus()));
+//				return null;
+//			}
+//        });
+		// Callback<TreeTableColumn<ToDoObj,Boolean>,TreeTableCell<ToDoObj,Boolean>>
+//		col0.set
+
 		col1.setCellFactory(TextFieldTreeTableCell.forTreeTableColumn());
 		col1.setOnEditCommit(new EventHandler<TreeTableColumn.CellEditEvent<ToDoObj, String>>() {
 			@Override
@@ -264,7 +374,7 @@ public class TodoList {
 			}
 		});
 
-		treeTableView.getColumns().addAll(col1, col2, col3);
+		treeTableView.getColumns().addAll(col0, col1, col2, col3);
 		treeTableView.setShowRoot(false);
 		treeTableView.setEditable(true);
 		treeTableView.setRoot(taskListRoot);
@@ -308,7 +418,7 @@ public class TodoList {
 				if (dialog.isPresent()) {
 					ToDoObj newToDo = (ToDoObj) dialog.get();
 
-					String newToDoName = newToDo.getAttribute("title");
+					String newToDoName = newToDo.getTitle();
 					if (newToDoName.length() > 0) {
 						TreeItem newTask = new TreeItem(newToDo);
 						taskList.getRoot().getChildren().add(0, newTask);
@@ -328,7 +438,7 @@ public class TodoList {
 
 				TreeItem<ToDoObj> parent;
 				TreeItem<ToDoObj> item = taskList.getSelectionModel().getSelectedItem();
-				String itemTitle = item.getValue().getAttribute("title");
+				String itemTitle = item.getValue().getTitle();
 
 				parent = item.getParent();
 				if (parent == null) { // God tier if statement
