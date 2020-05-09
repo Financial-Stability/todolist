@@ -221,11 +221,6 @@ public class TodoList {
 		TreeTableColumn<ToDoObj, String> col2 = new TreeTableColumn<>("Due Date");
 		TreeTableColumn<ToDoObj, String> col3 = new TreeTableColumn<>("Time");
 
-//		ObservableList<ToDoObj> cellData = FXCollections.observableArrayList();
-//		taskList.forEach(task -> {
-//			cellData.add(task);
-//		});
-
 		col0.setCellValueFactory(new TreeItemPropertyValueFactory<ToDoObj, Boolean>("completed"));
 		col1.setCellValueFactory(new TreeItemPropertyValueFactory<>("title"));
 		col2.setCellValueFactory(new TreeItemPropertyValueFactory<>("dueDate"));
