@@ -240,114 +240,42 @@ public class TodoList {
 		// Super useful resource for editing treeTableCells, also shows how to do
 		// drop-down menus
 		// https://www.youtube.com/watch?v=BNvVSU9nHDY
-		// You can add collumns to collumns : https://o7planning.org/en/11149/javafx-treetableview-tutorial
+		// You can add collumns to collumns :
+		// https://o7planning.org/en/11149/javafx-treetableview-tutorial
 
-		
-	       col0.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<ToDoObj, Boolean>, //
-	    	        ObservableValue<Boolean>>() {
-	    	 
-	    	            @Override
-	    	            public ObservableValue<Boolean> call(TreeTableColumn.CellDataFeatures<ToDoObj, Boolean> param) {
-	    	                TreeItem<ToDoObj> treeItem = param.getValue();
-	    	                ToDoObj emp = treeItem.getValue();
-	    	                SimpleBooleanProperty booleanProp= new SimpleBooleanProperty(emp.isCompleted());
-	    	                
-	    	                // Note: singleCol.setOnEditCommit(): Not work for
-	    	                // CheckBoxTreeTableCell.
-	    	                // When "Single?" column change.
-	    	                booleanProp.addListener(new ChangeListener<Boolean>() {
-	    	 
-	    	                    @Override
-	    	                    public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue,
-	    	                            Boolean newValue) {
-	    	                        emp.setCompleted(newValue);
-	    	                        System.out.println(newValue);
-	    	                    }                     
-	    	                });
-	    	                return booleanProp;
-	    	            }
-	    	        });
-	       
-	         col0.setCellFactory(new Callback<TreeTableColumn<ToDoObj,Boolean>,TreeTableCell<ToDoObj,Boolean>>() {
-	             @Override
-	             public TreeTableCell<ToDoObj,Boolean> call( TreeTableColumn<ToDoObj,Boolean> p ) {
-	                 CheckBoxTreeTableCell<ToDoObj,Boolean> cell = new CheckBoxTreeTableCell<ToDoObj,Boolean>();
-	                 cell.setAlignment(Pos.CENTER);
-	                 return cell;
-	             }
-	         });
-		
-//		col0.setCellFactory(CheckBoxTreeTableCell.forTreeTableColumn(col0));
-//		col0.setCellFactory(CheckBoxTreeTableCell.forTreeTableColumn(col0));
-		
-//		col0.setCellFactory(CheckBoxTreeTableCell.forTreeTableColumn(col0));
-//	    col0.setCellValueFactory(param -> {
-//            if(param.getValue().getValue() > 5) {
-//                return new SimpleBooleanProperty(true);
-//            } else {
-//                return new SimpleBooleanProperty(false);
-//            }
-//        });
-		
-//		 class BoundCheckBoxCell extends CheckBoxTreeTableCell<ToDoObj, Boolean> {
-//		 
-//	     public BoundCheckBoxCell() {
-//	    	 
-//	    	 System.out.print(itemProperty().getValue().booleanValue());
-////	         textProperty().bind(itemProperty());
-//	     }
-//	     
-//	 }
-		
-//		col0.setCellFactory(BoundCheckBoxCell.forTreeTableColumn(new Callback<Integer, ObservableValue<Boolean>>() {
-//			@Override
-//			public ObservableValue<Boolean> call(Integer param) {
-//				System.out.println(param);
-//				return null;
-//			}
-//		}));
-//		
-//      col0.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<ToDoObj,Boolean>,ObservableValue<Boolean>>() {
-//
-//		@Override
-//		public ObservableValue<Boolean> call(CellDataFeatures<ToDoObj, Boolean> arg0) {
-//			// TODO Auto-generated method stub 
-//			System.out.println(arg0);
-//			return null;
-//		}
-//    	  
-//      });
-		
-//		col0.setCellFactory(CheckBoxTreeTableCell(new CallBack<TreeTableColumn<ToDoObj>, ObservableProperty<Boolean>>, null));
-		 
-//		col0.setCellFactory(new Callback<TreeTableColumn<ToDoObj,Boolean>,TreeTableCell<ToDoObj,Boolean>>() {
-//
-//			@Override
-//			public TreeTableCell<ToDoObj, Boolean> call(TreeTableColumn<ToDoObj, Boolean> param) {
-//				// TODO Auto-generated method stub
-////				param.get
-//				System.out.println(param);
-//				return null;
-//			}
-//		});
-		
-//		col0.setCellFactory(BoundCheckBoxCell.forTreeTableColumn(col0));
+		col0.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<ToDoObj, Boolean>, //
+				ObservableValue<Boolean>>() {
 
-//		new callback<Integer, ObservableValue<Boolean>>,boolean
+			@Override
+			public ObservableValue<Boolean> call(TreeTableColumn.CellDataFeatures<ToDoObj, Boolean> param) {
+				TreeItem<ToDoObj> treeItem = param.getValue();
+				ToDoObj emp = treeItem.getValue();
+				SimpleBooleanProperty booleanProp = new SimpleBooleanProperty(emp.isCompleted());
 
-//        col0.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<ToDoObj,Boolean>,ObservableValue<Boolean>>() {
-//        	
-//			@Override
-//			public ObservableValue<Boolean> call(CellDataFeatures<ToDoObj, Boolean> arg0) {
-//				System.out.println(arg0.getTreeTableColumn());
-//				arg0.getValue().getValue();
-//				arg0.getTreeTableColumn();
-//				System.out.print(new ReadOnlyBooleanWrapper(arg0.getValue().getValue().completionStatus()));
-//				return null;
-//			}
-//        });
-		// Callback<TreeTableColumn<ToDoObj,Boolean>,TreeTableCell<ToDoObj,Boolean>>
-//		col0.set
+				// Note: singleCol.setOnEditCommit(): Not work for
+				// CheckBoxTreeTableCell.
+				// When "Single?" column change.
+				booleanProp.addListener(new ChangeListener<Boolean>() {
+
+					@Override
+					public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue,
+							Boolean newValue) {
+						emp.setCompleted(newValue);
+						System.out.println(newValue);
+					}
+				});
+				return booleanProp;
+			}
+		});
+
+		col0.setCellFactory(new Callback<TreeTableColumn<ToDoObj, Boolean>, TreeTableCell<ToDoObj, Boolean>>() {
+			@Override
+			public TreeTableCell<ToDoObj, Boolean> call(TreeTableColumn<ToDoObj, Boolean> p) {
+				CheckBoxTreeTableCell<ToDoObj, Boolean> cell = new CheckBoxTreeTableCell<ToDoObj, Boolean>();
+				cell.setAlignment(Pos.CENTER);
+				return cell;
+			}
+		});
 
 		col1.setCellFactory(TextFieldTreeTableCell.forTreeTableColumn());
 		col1.setOnEditCommit(new EventHandler<TreeTableColumn.CellEditEvent<ToDoObj, String>>() {
