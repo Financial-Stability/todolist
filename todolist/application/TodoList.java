@@ -46,8 +46,6 @@ import javafx.stage.StageStyle;
 import javafx.util.Callback;
 
 // Added features to do
-// TODO: Edit/Add descriptions under Trees
-// TODO: Add descriptions to tasks
 // TODO: Add Date/Time Selectors
 
 // Styling to do
@@ -226,13 +224,15 @@ public class TodoList {
 		TreeTableColumn<ToDoObj, String> col1 = new TreeTableColumn<>("Title");
 		TreeTableColumn<ToDoObj, String> col2 = new TreeTableColumn<>("Due Date");
 		TreeTableColumn<ToDoObj, String> col3 = new TreeTableColumn<>("Time");
+		TreeTableColumn<ToDoObj, String> col4 = new TreeTableColumn<>("Description");
 
 		col0.setCellValueFactory(new TreeItemPropertyValueFactory<ToDoObj, Boolean>("completed"));
 		col1.setCellValueFactory(new TreeItemPropertyValueFactory<>("title"));
 		col2.setCellValueFactory(new TreeItemPropertyValueFactory<>("dueDate"));
 		col3.setCellValueFactory(new TreeItemPropertyValueFactory<>("time"));
+		col4.setCellValueFactory(new TreeItemPropertyValueFactory<>("description"));
 
-		TreeItem<ToDoObj> taskListRoot = new TreeItem<ToDoObj>(new ToDoObj("Root", "filler", "text"));
+		TreeItem<ToDoObj> taskListRoot = new TreeItem<ToDoObj>(new ToDoObj("Root", "filler", "text", "description"));
 		for (ToDoObj task : taskList) {
 			TreeItem<ToDoObj> taskItem = new TreeItem<ToDoObj>(task);
 			taskListRoot.getChildren().add(taskItem);
@@ -302,8 +302,17 @@ public class TodoList {
 				editingTask.getValue().setTime(event.getNewValue());
 			}
 		});
+		
+		col4.setCellFactory(TextFieldTreeTableCell.forTreeTableColumn());
+		col4.setOnEditCommit(new EventHandler<TreeTableColumn.CellEditEvent<ToDoObj, String>>() {
+			@Override
+			public void handle(TreeTableColumn.CellEditEvent<ToDoObj, String> event) {
+				TreeItem<ToDoObj> editingTask = treeTableView.getTreeItem(event.getTreeTablePosition().getRow());
+				editingTask.getValue().setDescription(event.getNewValue());
+			}
+		});
 
-		treeTableView.getColumns().addAll(col0, col1, col2, col3);
+		treeTableView.getColumns().addAll(col0, col1, col2, col3, col4);
 		treeTableView.setShowRoot(false);
 		treeTableView.setEditable(true);
 		treeTableView.setRoot(taskListRoot);
@@ -494,11 +503,13 @@ public class TodoList {
 				add("Task Name");
 				add("Due Date");
 				add("Time");
+				add("Description");
 			}
 		};
 
 		ArrayList<TextField> elements = new ArrayList<TextField>() {
 			{
+				add(new TextField());
 				add(new TextField());
 				add(new TextField());
 				add(new TextField());
@@ -525,7 +536,7 @@ public class TodoList {
 			public ToDoObj call(ButtonType b) {
 
 				if (b == buttonTypeOk) {
-					return new ToDoObj(elements.get(0).getText(), elements.get(1).getText(), elements.get(2).getText());
+					return new ToDoObj(elements.get(0).getText(), elements.get(1).getText(), elements.get(2).getText(), elements.get(3).getText());
 				}
 
 				return null;
