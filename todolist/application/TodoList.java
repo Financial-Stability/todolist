@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import application.DataType.ToDoObj;
 import application.DataType.Tree;
+import javafx.application.Platform;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -36,6 +37,8 @@ import javafx.scene.control.TreeTableView;
 import javafx.scene.control.cell.CheckBoxTreeTableCell;
 import javafx.scene.control.cell.TextFieldTreeTableCell;
 import javafx.scene.control.cell.TreeItemPropertyValueFactory;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -46,7 +49,10 @@ import javafx.util.Callback;
 // TODO: Edit/Add descriptions under Trees
 // TODO: Add descriptions to tasks
 // TODO: Add Date/Time Selectors
-// TODO: Figure out styling
+
+// Styling to do
+// TODO: Style description input box (make borderless, perhaps wraparound text
+// TODO: Get rid of blue highlights around tabs
 
 // Bugs to do
 // TODO: Tree refreshes out of order (can be fixed by adding information sorting methods)
@@ -331,6 +337,40 @@ public class TodoList {
 			});
 		}
 
+		TextField description = new TextField();
+		if (topTree.getDescription() == "") {
+			description.setText("Description");
+		} else {
+			description.setText(topTree.getDescription());
+		}
+		description.textProperty().addListener((observable, oldValue, newValue) -> {
+			topTree.setDescription(newValue);
+		});
+		description.focusedProperty().addListener(new ChangeListener<Boolean>() {
+			@Override
+			public void changed(ObservableValue ov, Boolean t, Boolean t1) {
+		        Platform.runLater(new Runnable() {
+		            @Override
+		            public void run() {
+		                if (description.isFocused() && !description.getText().isEmpty()) {
+		                    description.selectAll();
+		                }
+		            }
+		        });
+			}
+		});
+		description.setOnKeyPressed(new EventHandler<KeyEvent>()
+	    {
+	        @Override
+	        public void handle(KeyEvent ke)
+	        {
+	            if (ke.getCode().equals(KeyCode.ENTER))
+	            {
+	                tabPane.requestFocus();
+	            }
+	        }
+	    });
+
 		Button newTaskButton = new Button("New Task");
 		newTaskButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
@@ -402,7 +442,7 @@ public class TodoList {
 
 		// Separates elements under each tab using VBox and creates the new, single tab
 		// to return
-		VBox listTabContainer = new VBox(new Label(topTree.getDescription()), buttonContainer, taskList, tabPane);
+		VBox listTabContainer = new VBox(description, buttonContainer, taskList, tabPane);
 		Tab newTab = new Tab(topTree.getTitle(), listTabContainer);
 
 		return newTab;
