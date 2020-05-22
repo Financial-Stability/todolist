@@ -1,6 +1,5 @@
 package application;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class TaskTree {
@@ -53,18 +52,30 @@ public class TaskTree {
     dueDate = null;
     startDate = null;
 
-    for (int i = 0; i < 10; i++) {
-      name = "Task " + i;
+    for (int i = 0; i < Math.random() * 10 + 3; i++) {
+      name = "task_" + i;
       root.children.add(new TaskNode(parent, children, name, checked, duration, project, flagged,
           notes, tags, dueDate, startDate));
     }
 
     for (TaskNode child : root.children) {
-      for (int i = 0; i < 5; i++) {
-        name = "subtask " + i;
-        parent = child;
-        child.children.add(new TaskNode(parent, children, name, checked, duration, project, flagged,
-            notes, tags, dueDate, startDate));
+      if (Math.random() < 0.8) {
+        for (int i = 0; i < Math.random() * 10 + 1; i++) {
+          name = "subtask_" + i;
+          parent = child;
+          child.children.add(new TaskNode(parent, children, name, checked, duration, project,
+              flagged, notes, tags, dueDate, startDate));
+        }
+      }
+      for (TaskNode subchild : child.children) {
+        if (Math.random() < 0.3) {
+          for (int i = 0; i < Math.random() * 10 + 1; i++) {
+            name = "subsubtask_" + i;
+            parent = subchild;
+            subchild.children.add(new TaskNode(parent, children, name, checked, duration, project,
+                flagged, notes, tags, dueDate, startDate));
+          }
+        }
       }
     }
     return tree;
