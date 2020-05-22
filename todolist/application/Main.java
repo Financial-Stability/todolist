@@ -46,6 +46,7 @@ public class Main extends Application {
 		dm = new DisplayManager();
 		tl = new TodoList();
 		ts = new TreeSerializer();
+		TaskTreeView treeView = new TaskTreeView();
 
 		Tree memoryHeldTaskData = ts.deserializeTree("serialStorage.ser");
 		if (memoryHeldTaskData != null) {
@@ -64,7 +65,8 @@ public class Main extends Application {
 		BorderPane root = new BorderPane();
 		root.setTop(dm.getMenuBar());
 		root.setLeft(settings);
-		root.setCenter(tl.getDisplayPane());
+//		root.setCenter(tl.getDisplayPane());
+		root.setCenter(treeView.getViewPane());
 		return root;
 	}
 
