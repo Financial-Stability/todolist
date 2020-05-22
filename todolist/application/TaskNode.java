@@ -54,5 +54,10 @@ public class TaskNode {
     this.startDate = startDate;
   }
 
+  @Override
+  public String toString() {
+    return name + " [duration=" + duration + ", project=" + project + ", flagged=" + flagged
+        + ", tags=" + tags + ", dueDate=" + dueDate + ", startDate=" + startDate + "]";
+  }
 
 }
