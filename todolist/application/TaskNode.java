@@ -1,15 +1,18 @@
 package application;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class TaskNode {
   protected TaskNode parent;
-  protected TaskNode[] children;
+  protected List<TaskNode> children;
   public String name;
   public boolean checked;
   public int duration;
   public String project;
   public boolean flagged;
   public String notes;
-  public String[] tags;
+  public List<String> tags;
   public String dueDate;
   public String startDate;
 
@@ -26,19 +29,27 @@ public class TaskNode {
    * @param dueDate
    * @param startDate
    */
-  public TaskNode(TaskNode parent, TaskNode[] children, String name, boolean checked, int duration,
-      String project, boolean flagged, String notes, String[] tags, String dueDate,
-      String startDate) {
+  public TaskNode(TaskNode parent, List<TaskNode> children, String name, boolean checked,
+      int duration, String project, boolean flagged, String notes, List<String> tags,
+      String dueDate, String startDate) {
     super();
     this.parent = parent;
-    this.children = children;
+    if (children == null) {
+      this.children = new ArrayList<TaskNode>();
+    } else {
+      this.children = children;
+    }
     this.name = name;
     this.checked = checked;
     this.duration = duration;
     this.project = project;
     this.flagged = flagged;
     this.notes = notes;
-    this.tags = tags;
+    if (tags == null) {
+      this.tags = new ArrayList<String>();
+    } else {
+      this.tags = tags;
+    }
     this.dueDate = dueDate;
     this.startDate = startDate;
   }
