@@ -46,7 +46,7 @@ public class Main extends Application {
 		dm = new DisplayManager();
 		tl = new TodoList();
 		ts = new TreeSerializer();
-		TaskTreeView treeView = new TaskTreeView();
+		TaskNormalTreeView treeView = new TaskNormalTreeView();
 
 		Tree memoryHeldTaskData = ts.deserializeTree("serialStorage.ser");
 		if (memoryHeldTaskData != null) {

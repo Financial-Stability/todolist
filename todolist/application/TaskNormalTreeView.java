@@ -9,11 +9,11 @@ import javafx.scene.control.TreeView;
 import javafx.scene.control.cell.CheckBoxTreeCell;
 import javafx.scene.layout.VBox;
 
-public class TaskTreeView implements View {
+public class TaskNormalTreeView implements View {
 
   private TaskTree tree;
 
-  TaskTreeView() {
+  TaskNormalTreeView() {
     tree = TaskTree.makeExampleTree();
   }
 
@@ -24,33 +24,33 @@ public class TaskTreeView implements View {
 
   @Override
   public Node getViewPane() {
-    TreeView<String> view = treeToView();
+    TreeView<TaskNode> view = generateTreeView();
     view.setShowRoot(false);
-    view.setCellFactory(CheckBoxTreeCell.<String>forTreeView());
+    view.setCellFactory(CheckBoxTreeCell.<TaskNode>forTreeView());
     return view;
   }
 
-  private TreeView<String> treeToView() {
-    CheckBoxTreeItem<String> root = new CheckBoxTreeItem<String>(tree.getRoot().name);
+  private TreeView<TaskNode> generateTreeView() {
+    CheckBoxTreeItem<TaskNode> root = new CheckBoxTreeItem<>(tree.getRoot());
     root.setExpanded(true);
 
-    List<CheckBoxTreeItem<String>> toAdd = new ArrayList<>();
+    List<CheckBoxTreeItem<TaskNode>> toAdd = new ArrayList<>();
     for (TaskNode child : tree.getRoot().children) {
       toAdd.add(treeToViewHelper(child));
     }
     root.getChildren().addAll(toAdd);
 
-    TreeView<String> treeView = new TreeView<String>(root);
+    TreeView<TaskNode> treeView = new TreeView<TaskNode>(root);
 
     return treeView;
   }
 
-  private CheckBoxTreeItem<String> treeToViewHelper(TaskNode node) {
-    CheckBoxTreeItem<String> item = new CheckBoxTreeItem<>(node.toString());
+  private CheckBoxTreeItem<TaskNode> treeToViewHelper(TaskNode node) {
+    CheckBoxTreeItem<TaskNode> item = new CheckBoxTreeItem<>(node);
     // CheckBoxTreeItem<String> item =
     // new CheckBoxTreeItem<>(node.name, new Label("Label: " + node.name), node.checked);
 
-    List<CheckBoxTreeItem<String>> toAdd = new ArrayList<>();
+    List<CheckBoxTreeItem<TaskNode>> toAdd = new ArrayList<>();
     for (TaskNode child : node.children) {
       toAdd.add(treeToViewHelper(child));
     }
