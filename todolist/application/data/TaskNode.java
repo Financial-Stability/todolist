@@ -1,4 +1,4 @@
-package application;
+package application.data;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -12,7 +12,7 @@ public class TaskNode implements Serializable {
   private static final long serialVersionUID = 1L;
 
   protected TaskNode parent;
-  protected List<TaskNode> children;
+  public List<TaskNode> children;
   public String name;
   public boolean checked;
   public int duration;

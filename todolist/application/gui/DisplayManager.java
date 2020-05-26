@@ -1,4 +1,4 @@
-package application;
+package application.gui;
 
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;

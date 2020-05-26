@@ -1,12 +1,8 @@
 package application;
 
 import javafx.application.Application;
-
-import java.io.FileNotFoundException;
-
-import application.DataType.Tree;
-import application.PersistentData.TreeSerializer;
-
+import application.gui.DisplayManager;
+import application.gui.treeview.TaskNormalTreeView;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
@@ -20,14 +16,11 @@ public class Main extends Application {
   private static final String APP_TITLE = "Todo App";
 
   DisplayManager dm;
-  // TodoList tl;
-  TreeSerializer ts;
 
   @Override
   public void start(Stage stage) throws Exception {
 
     stage.setOnCloseRequest(event -> {
-      // ts.serializeTree(tl.getTaskData(), "serialStorage.ser");
     });
 
     // set the scene
@@ -44,18 +37,7 @@ public class Main extends Application {
   private Pane createPane() {
     dm = new DisplayManager();
     // tl = new TodoList();
-    ts = new TreeSerializer();
     TaskNormalTreeView treeView = new TaskNormalTreeView();
-
-    // Tree memoryHeldTaskData = ts.deserializeTree("serialStorage.ser");
-    // if (memoryHeldTaskData != null) {
-    // tl.setTaskData(memoryHeldTaskData);
-    // tl.refreshTree(false);
-    // } else {
-    // Tree defaultTree = new Tree("Default Tree",
-    // "This tree is created when no file with saved data is refrenced");
-    // tl.setTaskData(defaultTree);
-    // }
 
     VBox settings = new VBox();
     settings.getChildren().addAll(dm.getSettings(), treeView.getSettingsPane());
