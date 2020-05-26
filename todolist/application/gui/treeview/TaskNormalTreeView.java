@@ -36,20 +36,20 @@ public class TaskNormalTreeView implements View {
 
     TreeView<TaskNode> tree = generateTreeView();
     tree.setShowRoot(false);
-    // tree.setCellFactory(new TaskNodeCellFactory());
-    tree.setCellFactory(p -> new CheckBoxTreeCell<TaskNode>() {
-      @Override
-      public void updateItem(TaskNode item, boolean empty) {
-        super.updateItem(item, empty);
-        if (item == null)
-          return;
-        if (!empty) {
-          setText(item.name);
-        } else {
-          setText(null);
-        }
-      }
-    });
+    tree.setCellFactory(new TaskNodeCellFactory());
+    // tree.setCellFactory(p -> new CheckBoxTreeCell<TaskNode>() {
+    // @Override
+    // public void updateItem(TaskNode item, boolean empty) {
+    // super.updateItem(item, empty);
+    // if (item == null)
+    // return;
+    // if (!empty) {
+    // setText(item.name);
+    // } else {
+    // setText(null);
+    // }
+    // }
+    // });
 
     // tree.setMaxWidth(Region.USE_PREF_SIZE);
 
