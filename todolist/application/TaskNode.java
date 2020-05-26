@@ -10,7 +10,7 @@ public class TaskNode implements Serializable {
    * 
    */
   private static final long serialVersionUID = 1L;
-  
+
   protected TaskNode parent;
   protected List<TaskNode> children;
   public String name;
@@ -66,18 +66,20 @@ public class TaskNode implements Serializable {
     return name + " [duration=" + duration + ", project=" + project + ", flagged=" + flagged
         + ", tags=" + tags + ", dueDate=" + dueDate + ", startDate=" + startDate + "]";
   }
-  
+
   @Override
   public int hashCode() {
-      return Objects.hash(name);
+    return Objects.hash(name);
   }
-  
-  @Override
-  public boolean equals(Object obj) {
-      if (obj == null) return false;
-      if (getClass() != obj.getClass()) return false;
-      final TaskNode other = (TaskNode) obj;
-      return Objects.equals(this, other);
-  }
+
+  // @Override
+  // public boolean equals(Object obj) {
+  // if (obj == null)
+  // return false;
+  // if (getClass() != obj.getClass())
+  // return false;
+  // final TaskNode other = (TaskNode) obj;
+  // return Objects.equals(this, other);
+  // }
 
 }
