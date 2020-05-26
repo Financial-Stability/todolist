@@ -1,9 +1,16 @@
 package application;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
-public class TaskNode {
+public class TaskNode implements Serializable {
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 1L;
+  
   protected TaskNode parent;
   protected List<TaskNode> children;
   public String name;
@@ -58,6 +65,19 @@ public class TaskNode {
   public String toString() {
     return name + " [duration=" + duration + ", project=" + project + ", flagged=" + flagged
         + ", tags=" + tags + ", dueDate=" + dueDate + ", startDate=" + startDate + "]";
+  }
+  
+  @Override
+  public int hashCode() {
+      return Objects.hash(name);
+  }
+  
+  @Override
+  public boolean equals(Object obj) {
+      if (obj == null) return false;
+      if (getClass() != obj.getClass()) return false;
+      final TaskNode other = (TaskNode) obj;
+      return Objects.equals(this, other);
   }
 
 }
